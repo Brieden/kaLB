@@ -1,3 +1,6 @@
+![100% kaLB in Aktion][logo]
+[logo]: https://git.physik.uni-marburg.de/Briedens/LBM_for_Fluid_Simulations/blob/development/Video_name_kaLB.gif "kaLB Logo"
+
 # Lattice Boltzmann Method for Fluid Simulations
 
 This repository contains the project work form Sven Brieden(Briedens@uni-marburg.de) for the lecture Scientific Software Development by Jan Oliver Oelerich(jan.oliver.oelerich@physik.uni-marburg.de).
