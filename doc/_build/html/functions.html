@@ -52,7 +52,7 @@
 <span id="functions-and-routines-of-the-code"></span><h1>functions and routines of the code<a class="headerlink" href="#module-core" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="kalb-kaum-ausgereiftes-lattice-boltzmann">
 <h2>kaLB = kaum ausgereiftes Lattice Boltzmann<a class="headerlink" href="#kalb-kaum-ausgereiftes-lattice-boltzmann" title="Permalink to this headline">¶</a></h2>
-<p>Corefunctions to calculate fluid dynamics</p>
+<p>Corefunction to calculate fluid dynamics</p>
 </div>
 <div class="section" id="initialize">
 <h2>initialize<a class="headerlink" href="#initialize" title="Permalink to this headline">¶</a></h2>
@@ -74,7 +74,38 @@
 <dl class="function">
 <dt id="core.calc_macroscopic">
 <code class="descclassname">core.</code><code class="descname">calc_macroscopic</code><span class="sig-paren">(</span><em>f</em>, <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#core.calc_macroscopic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<dd><p>Calculate macroscopic density and velocity.</p>
+<p>Take a distribution function <span class="math">\(f_i\)</span> and direction-vectors <span class="math">\(\vec{e}_i\)</span>
+and compute related density <span class="math">\(\rho\)</span> and velocity <span class="math">\(\vec{u}\)</span>:</p>
+<blockquote>
+<div><div class="math">
+\[\rho(\vec{x}, t) = \sum_{i} f_{i}(\vec{x}, t)\]</div>
+<div class="math">
+\[\vec{u}(\vec{x}, t) = \frac{1}{\rho}\sum_{i} f_{i}\vec{e}_{i}\]</div>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>f</strong> – distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>e</strong> – directions: numpy-array with shape = (<em>i</em>, 2),
+with <em>i</em> = 9 = Number of directions.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">rho: macroscopic density:
+numpy-array with shape = (<em>n_x</em>, <em>n_y</em>).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">vel: macroscopic velocity:
+numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -92,7 +123,7 @@
 <dl class="function">
 <dt id="core.collision_step">
 <code class="descclassname">core.</code><code class="descname">collision_step</code><span class="sig-paren">(</span><em>f_in</em>, <em>f_eq</em>, <em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#core.collision_step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<dd><p>Perform collision-step and return the updated distribution function f_out.</p>
 </dd></dl>
 
 </div>
@@ -101,7 +132,7 @@
 <dl class="function">
 <dt id="core.stream_step">
 <code class="descclassname">core.</code><code class="descname">stream_step</code><span class="sig-paren">(</span><em>f_out</em>, <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#core.stream_step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<dd><p>Perform streaming-step and return the shifted distribution function.</p>
 </dd></dl>
 
 </div>
@@ -226,7 +257,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Simon Schmitt &amp; Sven Brieden.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

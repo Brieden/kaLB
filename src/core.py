@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import time
 
 def initialize():
-    """ Function
+    """
+    Function
     :Example:
 
     >>> import template
@@ -20,7 +21,30 @@ def initialize():
 
 
 def calc_macroscopic(f, e):
-    """ Function"""
+    """
+    Calculate macroscopic density and velocity.
+    
+    Take a distribution function :math:`f_i` and direction-vectors :math:`\\vec{e}_i`
+    and compute related density :math:`\\rho` and velocity :math:`\\vec{u}`:
+
+        .. math::
+            \\rho(\\vec{x}, t) = \sum_{i} f_{i}(\\vec{x}, t)
+        .. math::
+            \\vec{u}(\\vec{x}, t) = \\frac{1}{\\rho}\sum_{i} f_{i}\\vec{e}_{i}
+
+    :param f: distribution function:
+        numpy-array with shape = (*i*, *n_x*, *n_y*),
+        with *i* = 9 = Number of directions.
+
+    :param e: directions: numpy-array with shape = (*i*, 2),
+        with *i* = 9 = Number of directions.
+
+    :returns: rho: macroscopic density:
+        numpy-array with shape = (*n_x*, *n_y*).
+    
+    :returns: vel: macroscopic velocity:
+        numpy-array with shape = (2, *n_x*, *n_y*).
+    """
     rho = np.sum(f, axis=0)
     vel = np.dot(e.transpose(), f.transpose((1, 0, 2))) / rho
     return rho, vel
@@ -42,12 +66,16 @@ def calc_equilibrium(rho, vel, e, w):
 
 
 def collision_step(f_in, f_eq, tau):
-    """ Function"""
+    """
+    Perform collision-step and return the updated distribution function f_out.
+    """
     return f_in - (f_in - f_eq)/tau
 
 
 def stream_step(f_out, e):
-    """ Function"""
+    """
+    Perform streaming-step and return the shifted distribution function.
+    """
     f_in = np.empty_like(f_out)
     for i in range(9):
         f_in[i] = np.roll(f_out[i], shift=e[i], axis=(0, 1))
