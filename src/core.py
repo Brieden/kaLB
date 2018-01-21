@@ -39,10 +39,10 @@ def calc_macroscopic(f, e):
     :param e: directions: numpy-array with shape = (*i*, 2),
         with *i* = 9 = Number of directions.
 
-    :returns: rho: macroscopic density:
+    :returns: **rho**: macroscopic density:
         numpy-array with shape = (*n_x*, *n_y*).
     
-    :returns: vel: macroscopic velocity:
+    :returns: **vel**: macroscopic velocity:
         numpy-array with shape = (2, *n_x*, *n_y*).
     """
     rho = np.sum(f, axis=0)
