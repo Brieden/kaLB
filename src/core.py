@@ -12,11 +12,6 @@ import time
 def initialize():
     """
     Function
-    :Example:
-
-    >>> import template
-    >>> a = template.MainClass1()
-    >>> a.function1(1,1,1)
     """
     return
 
@@ -293,7 +288,7 @@ def correct_outflow(f_in, direction_sets, direction):
     return f_in
 
 
-def save_state(step, f_in, intervall=0):
+def save_state(step, f_in, intervall=1):
     """
     Save distribution function for specified steps.
 
@@ -355,8 +350,8 @@ def main():
     for step in range(timesteps):   # main loop
 
         print(
-            "Schritt: %i mit %.2f Mpoints/sek"
-            % (step, (time.time()-t_n)/(n_x*n_y)*1e6)
+            "Schritt: %i mit %.2f M su/s"
+            % (step, (n_x*n_y*1e-6)/(time.time()-t_n))
         )
         t_n = time.time()
         rho, vel = calc_macroscopic(f_in, e)
@@ -374,9 +369,10 @@ def main():
         plt.imshow(u.transpose(), vmin=0, vmax=v_max, origin='lower')
         plt.savefig("Bild_%i.jpeg" % step)
     print(
-        "%i Schritte in %2.f sek mit %.2f Mpoints/sek"
+        "%i Schritte in %2.f sek mit %.2f M su/s"
         % (timesteps, time.time()-t_0,
-           (time.time()-t_0)/(n_x*n_y)*1e6/timesteps))
+           (n_x*n_y*timesteps*1e-6/(time.time()-t_0)))
+         )
     return
 
 
