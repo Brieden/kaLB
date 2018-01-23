@@ -1,0 +1,51 @@
+{
+  "simulation parameters" : {
+    "simulation_name"  : "Example Run",
+    "simulation_id"    : "001",
+    "time_steps"       : 3000,
+    "lattice points x" : 400,
+    "lattice points y" : 300
+  },
+  "physically parameters" : {
+    "Reynolds number" : 400
+  },
+  "obstacle parameters" : {
+    "cylindrical obstacle" : {
+      "x-position": 100,
+      "y-position": 150,
+      "radius": 50
+    },
+    "png import" : {
+      "file name": ""
+    }
+  },
+  "boundary conditions" : {
+    "bounce-back boundary" : {
+      "N" : "bounce-back",
+      "E" : "Zou-He",
+      "S" : "outflow",
+      "W" : "bounce-back"
+    },
+    "inflow: Zou-He" : {
+      "speed" : 1
+    }
+  },
+  "output configuration"     : {
+       "picture configuration" : {
+           "file name"           : "LBM_pic_",
+           "picture file type"   : "png",
+           "output frequency"    : 100
+       },
+       "rawdata configuration" : {
+           "file name"          : "LBM_data",
+           "output frequency"   : 500,
+           "output data"        :{
+             "velocity" : 0,
+             "pressure" : 0
+           }
+       }
+   },
+   "snapshot" : {
+     "output frequency"   : 1000
+   }
+}
