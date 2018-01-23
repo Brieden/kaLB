@@ -75,13 +75,14 @@
 <dt id="core.calc_macroscopic">
 <code class="descclassname">core.</code><code class="descname">calc_macroscopic</code><span class="sig-paren">(</span><em>f</em>, <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#core.calc_macroscopic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate macroscopic density and velocity.</p>
-<p>Take a distribution function <span class="math">\(f_i\)</span> and direction-vectors <span class="math">\(\vec{e}_i\)</span>
+<p>Take a distribution function <span class="math">\(f_i\)</span>
+and direction-vectors <span class="math">\(\vec{e}_i\)</span>
 and compute related density <span class="math">\(\rho\)</span> and velocity <span class="math">\(\vec{u}\)</span>:</p>
 <blockquote>
 <div><div class="math">
-\[\rho(\vec{x}, t) = \sum_{i} f_{i}(\vec{x}, t)\]</div>
+\[\rho(\vec{x}) = \sum_{i} f_{i}(\vec{x})\]</div>
 <div class="math">
-\[\vec{u}(\vec{x}, t) = \frac{1}{\rho}\sum_{i} f_{i}\vec{e}_{i}\]</div>
+\[\vec{u}(\vec{x}) = \frac{1}{\rho}\sum_{i} f_{i}\vec{e}_{i}\]</div>
 </div></blockquote>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -91,7 +92,7 @@ and compute related density <span class="math">\(\rho\)</span> and velocity <spa
 <li><strong>f</strong> – distribution function:
 numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
 with <em>i</em> = 9 = Number of directions.</li>
-<li><strong>e</strong> – directions: numpy-array with shape = (<em>i</em>, 2),
+<li><strong>e</strong> – directions: numpy-array with shape = (<em>i</em>, <em>2</em>),
 with <em>i</em> = 9 = Number of directions.</li>
 </ul>
 </td>
@@ -101,7 +102,7 @@ numpy-array with shape = (<em>n_x</em>, <em>n_y</em>).</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>vel</strong>: macroscopic velocity:
-numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
+numpy-array with shape = (<em>2</em>, <em>n_x</em>, <em>n_y</em>).</p>
 </td>
 </tr>
 </tbody>
@@ -114,7 +115,48 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <dl class="function">
 <dt id="core.calc_equilibrium">
 <code class="descclassname">core.</code><code class="descname">calc_equilibrium</code><span class="sig-paren">(</span><em>rho</em>, <em>vel</em>, <em>e</em>, <em>w</em><span class="sig-paren">)</span><a class="headerlink" href="#core.calc_equilibrium" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<dd><p>Calculate equilibrium distribution fuction <span class="math">\(f_{eq}\)</span>.</p>
+<p>Take macroscopic density <span class="math">\(\rho\)</span> and velocity <span class="math">\(\vec{u}\)</span>
+together with direction-vectors <span class="math">\(\vec{e}_i\)</span>
+and their according weight-vectors <span class="math">\(w_i\)</span>
+to calculate equilibrium distribution fuction <span class="math">\(f_{eq}\)</span>
+using Bhatnagar-Gross-Krook (BGK) collision, with <span class="math">\(c = 1\)</span>:</p>
+<blockquote>
+<div><div class="math">
+\[f_i^{eq}(\vec{x}) = w_i\rho(\vec{x}) * \left(
+1
++ 3 \frac{(\vec{e}_i * \vec{u})}{c}
++ \frac{9}{2} \frac{(\vec{e}_i * \vec{u})^2}{c^2}
+- \frac{3}{2} \frac{(\vec{u} * \vec{u})}{c^2}
+\right)\]</div>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rho</strong> – macroscopic density:
+numpy-array with shape = (<em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>vel</strong> – macroscopic velocity:
+numpy-array with shape = (<em>2</em>, <em>n_x</em>, <em>n_y</em>).
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>e</strong> – directions:
+numpy-array with shape = (<em>i</em>, <em>2</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>w</strong> – weights (according to directions):
+numpy-array with shape = (<em>i</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>f_eq</strong>: equilibrium distribution fuction:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -124,6 +166,37 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <dt id="core.collision_step">
 <code class="descclassname">core.</code><code class="descname">collision_step</code><span class="sig-paren">(</span><em>f_in</em>, <em>f_eq</em>, <em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#core.collision_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform collision-step and return the updated distribution function f_out.</p>
+<p>Use distribution function <span class="math">\(f_i\)</span>,
+equilibrium distribution function <span class="math">\(f_i^{eq}\)</span>
+and relaxation parameter <span class="math">\(\tau\)</span>
+to calculate the updated distribution function <span class="math">\(f_i^*\)</span>:</p>
+<blockquote>
+<div><div class="math">
+\[f_i^* = f_i - \frac{1}{\tau} (f_i - f_i^{eq})\]</div>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>f_in</strong> – distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>f_eq</strong> – equilibrium distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>tau</strong> – relaxation parameter:
+float <span class="math">\(\in\)</span> (.5, <span class="math">\(\infty\)</span>].</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>f_out</strong>: updated distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -133,6 +206,34 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <dt id="core.stream_step">
 <code class="descclassname">core.</code><code class="descname">stream_step</code><span class="sig-paren">(</span><em>f_out</em>, <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#core.stream_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform streaming-step and return the shifted distribution function.</p>
+<p>Use distribution function <span class="math">\(f_i\)</span>
+and direction-vectors <span class="math">\(\vec{e}_i\)</span>
+to calculate shifted distribution function <span class="math">\(f_i^*\)</span>:</p>
+<blockquote>
+<div><div class="math">
+\[f_i^*(\vec{x}) = f_i(\vec{x} + \vec{e}_i)\]</div>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>f_out</strong> – distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>e</strong> – directions:
+numpy-array with shape = (<em>i</em>, <em>2</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>f_in</strong>: shifted distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -140,8 +241,41 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <h2>correct_macroscopic<a class="headerlink" href="#correct-macroscopic" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="core.correct_macroscopic">
-<code class="descclassname">core.</code><code class="descname">correct_macroscopic</code><span class="sig-paren">(</span><em>rho</em>, <em>vel</em><span class="sig-paren">)</span><a class="headerlink" href="#core.correct_macroscopic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<code class="descclassname">core.</code><code class="descname">correct_macroscopic</code><span class="sig-paren">(</span><em>rho</em>, <em>vel</em>, <em>given_instream</em>, <em>direction_sets</em>, <em>direction</em><span class="sig-paren">)</span><a class="headerlink" href="#core.correct_macroscopic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Correct incoming density and velocity at a given border</p>
+<p>Take macroscopic density <span class="math">\(\rho\)</span> and velocity <span class="math">\(\vec{u}\)</span>
+and set velocity at the given border to given_instream
+and calculate according density at given border.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rho</strong> – macroscopic density:
+numpy-array with shape = (<em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>vel</strong> – macroscopic velocity:
+numpy-array with shape = (<em>2</em>, <em>n_x</em>, <em>n_y</em>).
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>given_instream</strong> – known velocity at given border:
+numpy-array with shape = (<em>2</em>, <em>1</em>, <em>n_y</em>).</li>
+<li><strong>direction_sets</strong> – dict to get sets of direction indices
+for corresponding direction specifier.</li>
+<li><strong>direction</strong> – list of direction specifiers:
+List of direction specifier strings (e.g.: [“N”,”E”])</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>rho</strong>: corrected macroscopic density:
+numpy-array with shape = (<em>n_x</em>, <em>n_y</em>).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>vel</strong>: corrected macroscopic velocity:
+numpy-array with shape = (<em>2</em>, <em>n_x</em>, <em>n_y</em>).</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -149,8 +283,36 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <h2>correct_distr_func<a class="headerlink" href="#correct-distr-func" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="core.correct_distr_func">
-<code class="descclassname">core.</code><code class="descname">correct_distr_func</code><span class="sig-paren">(</span><em>f_in</em>, <em>f_eq</em><span class="sig-paren">)</span><a class="headerlink" href="#core.correct_distr_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<code class="descclassname">core.</code><code class="descname">correct_distr_func</code><span class="sig-paren">(</span><em>f_in</em>, <em>f_eq</em>, <em>direction_sets</em>, <em>direction</em><span class="sig-paren">)</span><a class="headerlink" href="#core.correct_distr_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Correct incoming components of distribution function at Zou-He Border</p>
+<p>Take the current distribution function <span class="math">\(f_i\)</span>
+and calculate corrected values
+for incoming components of the distribution function using Zou-He.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>f_in</strong> – distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>f_eq</strong> – equilibrium distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>direction_sets</strong> – dict to get sets of direction indices
+for corresponding direction specifier.</li>
+<li><strong>direction</strong> – list of direction specifiers:
+List of direction specifier strings (e.g.: [“N”,”E”])</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>f_in</strong>: distribution function that satisfies BC:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -159,7 +321,43 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <dl class="function">
 <dt id="core.bounce_back">
 <code class="descclassname">core.</code><code class="descname">bounce_back</code><span class="sig-paren">(</span><em>f_in</em>, <em>f_out</em>, <em>obstacle</em>, <em>e_inverse</em><span class="sig-paren">)</span><a class="headerlink" href="#core.bounce_back" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<dd><p>Apply bounce back boundary condition (BC).</p>
+<p>Take the current distribution function <span class="math">\(f_i\)</span>
+and the distribution function after collision <span class="math">\(f_i^*\)</span>
+together with an array that specifies all obstacles
+and a list of indices <em>e_inverse</em>
+that correspond to the inverse directions of <span class="math">\(\vec{e}_i\)</span>.</p>
+<p>Compute a distribution function <span class="math">\(f_i^{BC}\)</span> that satisfies BC
+by copying components of the distribution function <span class="math">\(f_i\)</span>
+- which would stream into the obstacle -
+into their inverse direction of the post-collision distribution function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>f_in</strong> – distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>f_out</strong> – post-collision distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>obstacle</strong> – boolean obstacle matrix:
+numpy-array with shape = (<em>n_x</em>, <em>n_y</em>),
+with <em>True</em> for an obstacle.</li>
+<li><strong>e_inverse</strong> – list of inverse direction indices (e[e_inverse] = -e):
+numpy-array with shape = (<em>i</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>f_out</strong>: distribution function that satisfies BC:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -167,8 +365,33 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <h2>correct_outflow<a class="headerlink" href="#correct-outflow" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="core.correct_outflow">
-<code class="descclassname">core.</code><code class="descname">correct_outflow</code><span class="sig-paren">(</span><em>f_in</em><span class="sig-paren">)</span><a class="headerlink" href="#core.correct_outflow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<code class="descclassname">core.</code><code class="descname">correct_outflow</code><span class="sig-paren">(</span><em>f_in</em>, <em>direction_sets</em>, <em>direction</em><span class="sig-paren">)</span><a class="headerlink" href="#core.correct_outflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Correct distribution function</p>
+<p>Take post-streaming distribution function <span class="math">\(f_i\)</span>
+and replace incorrectly incoming components after streaming
+with second to last entries from that same distribution function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>f_in</strong> – distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+<li><strong>direction_sets</strong> – dict to get sets of direction indices
+for corresponding direction specifier.</li>
+<li><strong>direction</strong> – list of direction specifiers:
+List of direction specifier strings (e.g.: [“N”,”E”])</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>f_in</strong>: corrected distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -176,8 +399,25 @@ numpy-array with shape = (2, <em>n_x</em>, <em>n_y</em>).</p>
 <h2>save_state<a class="headerlink" href="#save-state" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="core.save_state">
-<code class="descclassname">core.</code><code class="descname">save_state</code><span class="sig-paren">(</span><em>step</em>, <em>f_in</em><span class="sig-paren">)</span><a class="headerlink" href="#core.save_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function</p>
+<code class="descclassname">core.</code><code class="descname">save_state</code><span class="sig-paren">(</span><em>step</em>, <em>f_in</em>, <em>intervall=0</em><span class="sig-paren">)</span><a class="headerlink" href="#core.save_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save distribution function for specified steps.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>step</strong> – current timestep:
+int</li>
+<li><strong>intervall</strong> – intervalls in wich to save distribution functions:
+int</li>
+<li><strong>f_in</strong> – current distribution function:
+numpy-array with shape = (<em>i</em>, <em>n_x</em>, <em>n_y</em>),
+with <em>i</em> = 9 = Number of directions.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
