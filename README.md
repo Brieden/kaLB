@@ -1,5 +1,5 @@
 ![100% kaLB in Aktion][logo]
-[logo]: https://git.physik.uni-marburg.de/Briedens/LBM_for_Fluid_Simulations/blob/development/Video_name_kaLB.gif "kaLB Logo"
+[logo]: https://github.com/Brieden/kaLB/blob/development/Video_name_kaLB.gif "kaLB Logo"
 
 # Lattice Boltzmann Method for Fluid Simulations
 
