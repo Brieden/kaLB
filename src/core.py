@@ -293,7 +293,7 @@ def correct_outflow(f_in, direction_sets, direction):
     return f_in
 
 
-def save_state(step, f_in, intervall=0):
+def save_state(step, f_in, intervall=1):
     """
     Save distribution function for specified steps.
 
