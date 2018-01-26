@@ -261,6 +261,7 @@ class Simulation():
         # fortzusetzen oder zu starten!
         # für den moment ist das aber erstmal okay so.
         self.calc_equilibrium()
+        self.f_in = self.f_eq
 
         # die eigentliche Schleife der Simulation
         for step in range(self.timesteps):
