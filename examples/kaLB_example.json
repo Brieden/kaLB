@@ -2,7 +2,7 @@
 	"simulation parameters" : {
 	    "simulation_name"	: "Example Run",
     	"simulation_id"		: "001",
-    	"time_steps"		: 10,
+    	"time_steps"		: 1,
     	"lattice points x"	: 400,
     	"lattice points y"	: 300,
 		"Reynolds number"	: 400
@@ -19,16 +19,29 @@
 		"speed" : 1
     },
 
-	"obstacle parameters" : {
-		"cylindrical obstacle" : {
+	"obstacle parameters" : [
+      {
+		  "type": "cylindrical obstacle",
+		  "x-position": 200,
+		  "y-position": 50,
+		  "radius": 10
+      },
+      {
+        "type": "cylindrical obstacle",
 		"x-position": 100,
-		"y-position": 150,
-		"radius": 50
-		},
-    	"png import" : {
-      		"file name": ""
-    	}
-	},
+	  	"y-position": 150,
+	  	"radius": 50
+      },
+      {
+        "type": "png import",
+	  	"file name": "test1.png"
+
+      },
+      {
+        "type" : "png import",
+	  	"file name": "test2.png"
+	  }
+	],
 
 	"output configuration"     : {
 		"picture configuration" : {
