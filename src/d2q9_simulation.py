@@ -9,6 +9,8 @@ import numpy as np
 # eigentlich sollte in dieser datei keine notwendigkeit zum plotten bestehen
 # -> am besten alle funktionen zum plotten & ansehen der ergebnisse auslagern!
 import matplotlib.pyplot as plt
+from PIL import Image
+import matplotlib.image as img
 
 
 class Simulation():
@@ -25,17 +27,17 @@ class Simulation():
     e_inverse = [0, 3, 4, 1, 2, 7, 8, 5, 6]
 
     direction_sets = {
-            "N": np.arange(9)[np.asarray([e_i[1] > 0 for e_i in e])],
-            "E": np.arange(9)[np.asarray([e_i[0] > 0 for e_i in e])],
-            "S": np.arange(9)[np.asarray([e_i[1] < 0 for e_i in e])],
-            "W": np.arange(9)[np.asarray([e_i[0] < 0 for e_i in e])]
-            }
+        "N": np.arange(9)[np.asarray([e_i[1] > 0 for e_i in e])],
+        "E": np.arange(9)[np.asarray([e_i[0] > 0 for e_i in e])],
+        "S": np.arange(9)[np.asarray([e_i[1] < 0 for e_i in e])],
+        "W": np.arange(9)[np.asarray([e_i[0] < 0 for e_i in e])]
+    }
 
     # weights
     w = np.array([
-        4/9,
-        1/9, 1/9, 1/9, 1/9,
-        1/36, 1/36, 1/36, 1/36
+        4 / 9,
+        1 / 9, 1 / 9, 1 / 9, 1 / 9,
+        1 / 36, 1 / 36, 1 / 36, 1 / 36
     ])
 
     def __init__(self):
@@ -49,7 +51,64 @@ class Simulation():
         # in der initialize_from_json funktion aus reynolds berechnet werden.
         self.tau = 10
 
-    def initialize_from_json(self, inputfile):
+    def cylinder_function(self, obstacle_parameter):
+        """
+
+        :param obstacle_parameter:
+        :return:
+        """
+        cylinder_y = obstacle_parameter["y-position"]
+        cylinder_x = obstacle_parameter["x-position"]
+        cylinder_r = obstacle_parameter["radius"]
+        return np.fromfunction(
+            lambda x, y: (x - cylinder_x) ** 2 + (y - cylinder_y) ** 2 < cylinder_r ** 2,
+            (self.n_x, self.n_y)).T
+
+    def png_importer(self, png_path):
+        """
+
+        :param png_path:
+        :return:
+        """
+        try:
+            image = img.imread(png_path)[:, :, :-1].sum(axis=2)
+        except IOError as error:
+            print("ERROR: It was not possible to read the picture: " + str(png_path))
+
+        if image.shape == self.shape:
+            return image[:] < 1
+        print("The shape of the picture %s does not match the shape of the simulation. "
+              "Simulation was aborted." %png_path)
+        quit()
+
+    def obstacles_definition(self, obstacle_parameters):
+        """
+        Function to combine the management and association of different obstacles.
+        In the loop over the obstacle can be added further types of them.
+
+        :param self:
+        :param obstacle_parameters:
+        :return: A boolean matrix in the dimension of the simulation grid with a "true" at
+        the points where there is an obstacle.
+        """
+        self.obstacle = np.full(shape=self.shape, fill_value=False)
+        for obstacle_parameter in obstacle_parameters:
+            if obstacle_parameter["type"] == "cylindrical obstacle":
+                self.obstacle = np.logical_or(self.obstacle,
+                                              self.cylinder_function(obstacle_parameter))
+            elif obstacle_parameter["type"] == "png import":
+                self.obstacle = np.logical_or(self.obstacle,
+                                              self.png_importer(obstacle_parameter["file name"]))
+            else:
+                print("obstacle ", obstacle_parameter, "not recognised")
+                quit()
+
+        self.obstacle = np.flip(self.obstacle, 0)
+        if self.args.verbose:
+            plt.imshow(self.obstacle, origin='lower', cmap='Greys',  interpolation='nearest')
+            plt.show()
+
+    def initialize_from_json(self, inputfile, args):
         """
         """
         # hier soll alles aus der json datei ausgelsen
@@ -71,33 +130,17 @@ class Simulation():
         self.n_x = simulation_parameters["lattice points x"]
         self.n_y = simulation_parameters["lattice points y"]
         self.reynolds = simulation_parameters["Reynolds number"]
+        self.args = args
 
         # für die Simulation benötigten Felder initialisieren
-        self.shape = (self.n_x, self.n_y)
+        self.shape = (self.n_y, self.n_x)
         self.rho = np.empty(shape=self.shape)
         self.vel = np.empty(shape=(2, self.shape[0], self.shape[1]))
         self.f_in = np.empty(shape=(9, self.shape[0], self.shape[1]))
         self.f_eq = np.empty_like(self.f_in)
         self.f_out = np.empty_like(self.f_in)
 
-        # hier sollen alle obstacles gelesen und verarbeitet werden.
-        # zunächst wird leerens matrix initiiert.
-        #
-        # über das dictionary kann unten iteriert werden!
-        self.obstacle = np.full(shape=self.shape, fill_value=False)
-        obstacle_parameters = inputfile["obstacle parameters"]
-
-        for obstacle_parameter in obstacle_parameters:
-            # etwas im Stil wie:
-            # obstacle_parameters[obstacle_parameter]
-            # sollte verwendet werden können,
-            # um durch alle im json-file angelegten obstacles zu iterieren.
-            # am besten werden wohl für jeden bekannten obstacle typ
-            # d.h.: "png", "circle", "recktange"....
-            # unterfunktionen aufgerufen,
-            # die aus jedem obstacle aus der json datei ein np.array machen.
-            # In dieser Schleife müsste dann ein logisches "oder" ausreichen.
-            pass
+        self.obstacles_definition(inputfile["obstacle parameters"])
 
         # als nächstes müssen die einstellungen für die boundary-condition
         # ausgelesen werden.
@@ -146,14 +189,14 @@ class Simulation():
                 - \\frac{3}{2} \\frac{(\\vec{u} * \\vec{u})}{c^2}
                 \\right)
         """
-        vel_sqared = self.vel[0]*self.vel[0] + self.vel[1]*self.vel[1]
+        vel_sqared = self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]
         e_n_x_vel = np.dot(self.e, self.vel.transpose(1, 0, 2))
         for i in range(9):
             self.f_eq[i] = self.rho * self.w[i] * (
-                1
-                + (3 * e_n_x_vel[i])
-                + (4.5 * e_n_x_vel[i]**2)
-                - (1.5 * vel_sqared)
+                    1
+                    + (3 * e_n_x_vel[i])
+                    + (4.5 * e_n_x_vel[i] ** 2)
+                    - (1.5 * vel_sqared)
             )
 
     def collision_step(self):
@@ -262,12 +305,15 @@ class Simulation():
         # für den moment ist das aber erstmal okay so.
         self.calc_equilibrium()
         self.f_in = self.f_eq
-
         # die eigentliche Schleife der Simulation
         for step in range(self.timesteps):
             # print-befehl nur dazu da um zu sehen, dass schleife läuft...
             print(step)
             # nur zum debugging:
-            #plt.imshow(np.linalg.norm(self.vel, axis=0).T, origin='lower')
-            #plt.show()
+            # plt.imshow(np.linalg.norm(self.vel, axis=0), origin='lower')
+            # plt.show()
+            if step%100==0:
+                plt.imshow((self.vel[0]*self.vel[0]*+self.vel[1]*self.vel[1]),vmin =0, vmax=1e-19, origin='lower')
+                #plt.savefig("Bild_%i.jpeg" % step)
+                plt.show()
             self.do_simulation_step()

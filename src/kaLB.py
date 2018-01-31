@@ -40,8 +40,13 @@ def parse_arguments():
         default='./output/',
         help="Specify path where to save the output."
     )
-    return parser.parse_args()
+    parser.add_argument(
+        '-v', '--verbose', required=False, action='store_true',
+        help="With this command, you can activate an issue of many hints."
+    )
 
+
+    return parser.parse_args()
 
 def main():
     """
@@ -52,7 +57,7 @@ def main():
     data = open_json(input_file)
 
     sim = Simulation()
-    sim.initialize_from_json(data)
+    sim.initialize_from_json(data, args)
     sim.run_simulation()
 
 

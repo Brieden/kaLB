@@ -2,7 +2,7 @@
 	"simulation parameters" : {
 	    "simulation_name"	: "Example Run",
     	"simulation_id"		: "001",
-    	"time_steps"		: 1,
+    	"time_steps"		: 2000,
     	"lattice points x"	: 400,
     	"lattice points y"	: 300,
 		"Reynolds number"	: 400
@@ -34,13 +34,9 @@
       },
       {
         "type": "png import",
-	  	"file name": "test1.png"
+	  	"file name": "kaLB_4_3.png"
 
-      },
-      {
-        "type" : "png import",
-	  	"file name": "test2.png"
-	  }
+      }
 	],
 
 	"output configuration"     : {
@@ -50,7 +46,7 @@
 		"output frequency"    : 100
 		},
 
-	"rawdata configuration"	: {
+	"raw data output configuration"	: {
 		"file name"     	: "LBM_data",
 		"output frequency" 	: 500,
 		"output data"    	: {
