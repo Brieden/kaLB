@@ -45,8 +45,8 @@ def parse_arguments():
         help="With this command, you can activate an issue of many hints."
     )
 
-
     return parser.parse_args()
+
 
 def main():
     """

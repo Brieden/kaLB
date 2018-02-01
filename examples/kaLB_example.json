@@ -1,6 +1,6 @@
 {
 	"simulation parameters" : {
-	    "simulation_name"	: "Example Run",
+		"simulation_name"	: "Example Run",
     	"simulation_id"		: "001",
     	"time_steps"		: 2000,
     	"lattice points x"	: 400,
@@ -20,42 +20,41 @@
     },
 
 	"obstacle parameters" : [
-      {
+        {
 		  "type": "cylindrical obstacle",
-		  "x-position": 200,
-		  "y-position": 50,
-		  "radius": 10
-      },
-      {
-        "type": "cylindrical obstacle",
-		"x-position": 100,
-	  	"y-position": 150,
-	  	"radius": 50
-      },
-      {
-        "type": "png import",
-	  	"file name": "kaLB_4_3.png"
-
-      }
-	],
+		  "x-position": 300,
+		  "y-position": 250,
+	  	  "radius": 40
+        },
+        {
+          "type": "cylindrical obstacle",
+		  "x-position": 100,
+	  	  "y-position": 250,
+	  	  "radius": 10
+        },
+        {
+          "type": "png import",
+	  	  "file name": "kaLB_4_3.png"
+        }
+    ],
 
 	"output configuration"     : {
 		"picture configuration" : {
-		"file name"           : "LBM_pic_",
-		"picture file type"   : "png",
-		"output frequency"    : 100
-		},
+		  "file name"           : "LBM_pic_",
+		  "picture file type"   : "png",
+		  "output frequency"    : 100
+        },
 
-	"raw data output configuration"	: {
-		"file name"     	: "LBM_data",
-		"output frequency" 	: 500,
-		"output data"    	: {
+	    "raw data output configuration"	: {
+		  "file name"     	: "LBM_data",
+		  "output frequency" 	: 500,
+		  "output data"    	: {
 			"velocity" : 0,
 			"pressure" : 0
-		}
-	}
+          }
+	    }
 	},
    "snapshot" : {
-     "output frequency"   : 1000
+     "output frequency" : 1000
    }
 }

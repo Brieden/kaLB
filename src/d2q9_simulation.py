@@ -9,8 +9,8 @@ import numpy as np
 # eigentlich sollte in dieser datei keine notwendigkeit zum plotten bestehen
 # -> am besten alle funktionen zum plotten & ansehen der ergebnisse auslagern!
 import matplotlib.pyplot as plt
-from PIL import Image
 import matplotlib.image as img
+import sys
 
 
 class Simulation():
@@ -61,7 +61,7 @@ class Simulation():
         cylinder_x = obstacle_parameter["x-position"]
         cylinder_r = obstacle_parameter["radius"]
         return np.fromfunction(
-            lambda x, y: (x - cylinder_x) ** 2 + (y - cylinder_y) ** 2 < cylinder_r ** 2,
+            lambda x, y: (-x + self.n_x - cylinder_x) ** 2 + (-y + self.n_y - cylinder_y) ** 2 < cylinder_r ** 2,
             (self.n_x, self.n_y)).T
 
     def png_importer(self, png_path):
@@ -78,7 +78,7 @@ class Simulation():
         if image.shape == self.shape:
             return image[:] < 1
         print("The shape of the picture %s does not match the shape of the simulation. "
-              "Simulation was aborted." %png_path)
+              "Simulation was aborted." % png_path)
         quit()
 
     def obstacles_definition(self, obstacle_parameters):
@@ -105,7 +105,7 @@ class Simulation():
 
         self.obstacle = np.flip(self.obstacle, 0)
         if self.args.verbose:
-            plt.imshow(self.obstacle, origin='lower', cmap='Greys',  interpolation='nearest')
+            plt.imshow(self.obstacle, origin='lower', cmap='Greys', interpolation='nearest')
             plt.show()
 
     def initialize_from_json(self, inputfile, args):
@@ -153,6 +153,22 @@ class Simulation():
         # umgang mit den output-parametern:
         # also alles was mit speichern, plotten,
         # oder ausgabe während des programms zu tun hat
+
+    def progress_bar(self, value, endvalue, bar_length=50):
+        """
+
+        :param value:
+        :param endvalue:
+        :param bar_length:
+        :return:
+        """
+
+        percent = float(value) / endvalue
+        arrow = '-' * int(round(percent * bar_length) - 1) + '>'
+        spaces = ' ' * (bar_length - len(arrow))
+
+        sys.stdout.write("\rPercent: [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
+        sys.stdout.flush()
 
     def calc_macroscopic(self):
         """
@@ -307,13 +323,12 @@ class Simulation():
         self.f_in = self.f_eq
         # die eigentliche Schleife der Simulation
         for step in range(self.timesteps):
-            # print-befehl nur dazu da um zu sehen, dass schleife läuft...
-            print(step)
-            # nur zum debugging:
-            # plt.imshow(np.linalg.norm(self.vel, axis=0), origin='lower')
-            # plt.show()
-            if step%100==0:
-                plt.imshow((self.vel[0]*self.vel[0]*+self.vel[1]*self.vel[1]),vmin =0, vmax=1e-19, origin='lower')
-                #plt.savefig("Bild_%i.jpeg" % step)
-                plt.show()
             self.do_simulation_step()
+            if self.args.verbose:
+                self.progress_bar(step, self.timesteps)
+                if step % 100 == 0:
+                    plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]), vmin=0, vmax=1e-8,
+                               origin='lower')
+                    # plt.savefig("Bild_%i.jpeg" % step)
+                    plt.show()
+
