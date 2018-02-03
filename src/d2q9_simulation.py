@@ -11,6 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 import sys
+import os
+import h5py
 
 
 class Simulation():
@@ -108,6 +110,30 @@ class Simulation():
             plt.imshow(self.obstacle, origin='lower', cmap='Greys', interpolation='nearest')
             plt.show()
 
+    def initialize_output(self, output_parameters):
+        if not os.path.exists(self.args.output):
+            os.makedirs(self.args.output)
+
+        if "raw data output configuration" in output_parameters:
+            raw_parameter = output_parameters["raw data output configuration"]
+            self.raw_output_frequency = raw_parameter["output frequency"]
+            print("\n \"You can ignore the warning, it's not going to cause any issues at the moment, but you should "
+                  "upgrade to the next release of h5py when it becomes available.\" "
+                  "https://github.com/h5py/h5py/issues/974\n")
+            h5file = h5py.File(self.args.output + raw_parameter["file name"]
+                               + ".hdf5", "w")
+            h5_output = h5file.create_group("raw data output configuration")
+            if raw_parameter["output data"]["velocity"] == 1:
+                self.h5_velocity = h5_output.create_group("velocity")
+
+            if raw_parameter["output data"]["pressure"] == 1:
+                self.h5_pressure = h5_output.create_group("pressure")
+
+    def store_raw_data(self, step):
+        if step % self.raw_output_frequency == 0:
+            self.h5_velocity.create_dataset("%i" % step, data=self.vel)
+            self.h5_pressure.create_dataset("%i" % step, data=self.rho)
+
     def initialize_from_json(self, inputfile, args):
         """
         """
@@ -153,6 +179,7 @@ class Simulation():
         # umgang mit den output-parametern:
         # also alles was mit speichern, plotten,
         # oder ausgabe während des programms zu tun hat
+        self.initialize_output(inputfile["output configuration"])
 
     def progress_bar(self, value, endvalue, bar_length=50):
         """
@@ -294,7 +321,7 @@ class Simulation():
         # TODO fulfill docstring
         self.f_in[(6, 3, 7), -1] = self.f_in[(6, 3, 7), -2]
 
-    def do_simulation_step(self):
+    def do_simulation_step(self, step):
         self.calc_macroscopic()
         self.correct_macroscopic()
         self.calc_equilibrium()
@@ -303,6 +330,7 @@ class Simulation():
         self.bounce_back()
         self.stream_step()
         self.correct_outflow()
+        self.store_raw_data(step)
 
     def run_simulation(self):
         # initialisiere ein anfangs-geschwindigkeitsfeld.
@@ -323,12 +351,10 @@ class Simulation():
         self.f_in = self.f_eq
         # die eigentliche Schleife der Simulation
         for step in range(self.timesteps):
-            self.do_simulation_step()
+            self.do_simulation_step(step)
             if self.args.verbose:
                 self.progress_bar(step, self.timesteps)
                 if step % 100 == 0:
                     plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]), vmin=0, vmax=1e-8,
                                origin='lower')
-                    # plt.savefig("Bild_%i.jpeg" % step)
                     plt.show()
-

@@ -2,7 +2,7 @@
 	"simulation parameters" : {
 		"simulation_name"	: "Example Run",
     	"simulation_id"		: "001",
-    	"time_steps"		: 2000,
+    	"time_steps"		: 3000,
     	"lattice points x"	: 400,
     	"lattice points y"	: 300,
 		"Reynolds number"	: 400
@@ -47,10 +47,10 @@
 
 	    "raw data output configuration"	: {
 		  "file name"     	: "LBM_data",
-		  "output frequency" 	: 500,
+		  "output frequency" 	: 20,
 		  "output data"    	: {
-			"velocity" : 0,
-			"pressure" : 0
+			"velocity" : 1,
+			"pressure" : 1
           }
 	    }
 	},
