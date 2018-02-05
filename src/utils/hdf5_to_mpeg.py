@@ -20,7 +20,7 @@ def make_velocity_pictures(number):
     plt.cla()
 
 
-filename = "LBM_data.hdf5"
+filename = "LBM_raw_data.hdf5"
 f = h5py.File(filename, 'r')
 a_group_key = list(f.keys())
 

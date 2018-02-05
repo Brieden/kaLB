@@ -68,7 +68,6 @@ class Simulation():
 
     def png_importer(self, png_path):
         """
-
         :param png_path:
         :return:
         """
@@ -111,28 +110,58 @@ class Simulation():
             plt.show()
 
     def initialize_output(self, output_parameters):
+        """
+        :param output_parameters:
+        :return:
+        """
+        self.raw_output = False
+        self.picture_output = False
+        self.snapshot = False
+
         if not os.path.exists(self.args.output):
             os.makedirs(self.args.output)
 
+        if "snapshot" in output_parameters:
+            if not os.path.exists(self.args.output + "snapshots"):
+                os.makedirs(self.args.output + "snapshots")
+            self.snapshot = True
+            self.snapshot_frequency = output_parameters["snapshot"]["output frequency"]
+
+        if "picture output configuration" in output_parameters:
+            picture_parameter = output_parameters["picture output configuration"]
+            self.picture_output = True
+            self.picture_output_frequency = picture_parameter["output frequency"]
+            self.picture_output_typ = picture_parameter["file type"]
+            self.picture_output_name = picture_parameter["file name"]
+
         if "raw data output configuration" in output_parameters:
             raw_parameter = output_parameters["raw data output configuration"]
+            self.raw_output = True
             self.raw_output_frequency = raw_parameter["output frequency"]
-            print("\n \"You can ignore the warning, it's not going to cause any issues at the moment, but you should "
-                  "upgrade to the next release of h5py when it becomes available.\" "
-                  "https://github.com/h5py/h5py/issues/974\n")
             h5file = h5py.File(self.args.output + raw_parameter["file name"]
                                + ".hdf5", "w")
             h5_output = h5file.create_group("raw data output configuration")
             if raw_parameter["output data"]["velocity"] == 1:
                 self.h5_velocity = h5_output.create_group("velocity")
-
             if raw_parameter["output data"]["pressure"] == 1:
                 self.h5_pressure = h5_output.create_group("pressure")
 
-    def store_raw_data(self, step):
-        if step % self.raw_output_frequency == 0:
-            self.h5_velocity.create_dataset("%i" % step, data=self.vel)
-            self.h5_pressure.create_dataset("%i" % step, data=self.rho)
+    def store_output(self, step):
+        """
+        :param step:
+        :return:
+        """
+        if self.snapshot:
+            if step % self.snapshot_frequency == 0:
+                np.save(self.args.output + "snapshots/snap_%05i.npz" % step, self.f_in)
+        if self.raw_output:
+            if step % self.raw_output_frequency == 0:
+                self.h5_velocity.create_dataset("%i" % step, data=self.vel)
+                self.h5_pressure.create_dataset("%i" % step, data=self.rho)
+        if self.picture_output:
+            if step % self.picture_output_frequency == 0:
+                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]), origin='lower')
+                plt.savefig(self.args.output + self.picture_output_name + "%05i." % step + self.picture_output_typ)
 
     def initialize_from_json(self, inputfile, args):
         """
@@ -183,13 +212,11 @@ class Simulation():
 
     def progress_bar(self, value, endvalue, bar_length=50):
         """
-
         :param value:
         :param endvalue:
         :param bar_length:
         :return:
         """
-
         percent = float(value) / endvalue
         arrow = '-' * int(round(percent * bar_length) - 1) + '>'
         spaces = ' ' * (bar_length - len(arrow))
@@ -330,7 +357,7 @@ class Simulation():
         self.bounce_back()
         self.stream_step()
         self.correct_outflow()
-        self.store_raw_data(step)
+        self.store_output(step)
 
     def run_simulation(self):
         # initialisiere ein anfangs-geschwindigkeitsfeld.
@@ -349,12 +376,8 @@ class Simulation():
         # für den moment ist das aber erstmal okay so.
         self.calc_equilibrium()
         self.f_in = self.f_eq
-        # die eigentliche Schleife der Simulation
+
         for step in range(self.timesteps):
             self.do_simulation_step(step)
             if self.args.verbose:
                 self.progress_bar(step, self.timesteps)
-                if step % 100 == 0:
-                    plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]), vmin=0, vmax=1e-8,
-                               origin='lower')
-                    plt.show()

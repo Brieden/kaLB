@@ -39,22 +39,21 @@
     ],
 
 	"output configuration"     : {
-		"picture configuration" : {
-		  "file name"           : "LBM_pic_",
-		  "picture file type"   : "png",
-		  "output frequency"    : 100
-        },
-
-	    "raw data output configuration"	: {
-		  "file name"     	: "LBM_data",
-		  "output frequency" 	: 20,
-		  "output data"    	: {
-			"velocity" : 1,
-			"pressure" : 1
-          }
-	    }
-	},
-   "snapshot" : {
-     "output frequency" : 1000
-   }
+		"picture output configuration": {
+			"file name": "LBM_pic_",
+			"file type": "png",
+			"output frequency": 50
+		},
+		"raw data output configuration": {
+			"file name": "LBM_raw_data",
+			"output frequency": 30,
+			"output data": {
+				"velocity": 1,
+				"pressure": 1
+			}
+		},
+		"snapshot": {
+			"output frequency": 1000
+		}
+	}
 }
