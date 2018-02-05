@@ -19,8 +19,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../src'))
 
+sys.path.insert(0, os.path.abspath('../src'))
 
 # -- General configuration ------------------------------------------------
 
@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.mathjax']
+              'sphinx.ext.mathjax']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -82,7 +82,7 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#'alabaster'
+# 'alabaster'
 html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -104,18 +104,16 @@ html_static_path = ['_static']
 html_sidebars = {
     '**': [
         'globaltoc.html',
-#        'relations.html',
+        #        'relations.html',
         'sourcelink.html',
         'searchbox.html'
     ]
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'kaLBdoc'
-
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -145,7 +143,6 @@ latex_documents = [
      'Simon Schmitt \\& Sven Brieden', 'manual'),
 ]
 
-
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
@@ -154,7 +151,6 @@ man_pages = [
     (master_doc, 'kalb', 'kaLB Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 
