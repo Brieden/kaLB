@@ -4,6 +4,9 @@ import numpy as np
 import h5py
 import os
 
+plt.style.use('bmh')
+plt.rcParams['figure.figsize'] = (16.0, 9.0)
+
 
 def make_pressure_pictures(number):
     plt.imshow(np.array(pressure_values[number]), origin="lower")
