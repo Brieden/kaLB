@@ -1,8 +1,8 @@
 {
 	"simulation parameters" : {
-		"simulation_name"	: "Example Run",
-    	"simulation_id"		: "001",
-    	"time_steps"		: 3000,
+		"simulation name"	: "Example Run",
+    	"simulation id"		: "001",
+    	"time steps"		: 3000,
     	"lattice points x"	: 400,
     	"lattice points y"	: 300,
 		"Reynolds number"	: 400

@@ -179,9 +179,9 @@ class Simulation():
         # zunächst werden simulationsparameter gelesen und gesetzt.
         # achtung, json datei ist leicht umgebaut!
         simulation_parameters = inputfile["simulation parameters"]
-        self.name = simulation_parameters["simulation_name"]
-        self.id = simulation_parameters["simulation_id"]
-        self.timesteps = simulation_parameters["time_steps"]
+        self.name = simulation_parameters["simulation name"]
+        self.id = simulation_parameters["simulation id"]
+        self.timesteps = simulation_parameters["time steps"]
         self.n_x = simulation_parameters["lattice points x"]
         self.n_y = simulation_parameters["lattice points y"]
         self.reynolds = simulation_parameters["Reynolds number"]
