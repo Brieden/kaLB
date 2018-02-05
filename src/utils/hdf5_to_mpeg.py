@@ -1,7 +1,24 @@
-import numpy as np
+from multiprocessing import Pool
 import matplotlib.pyplot as plt
+import numpy as np
 import h5py
 import os
+
+
+def make_pressure_pictures(number):
+    plt.imshow(np.array(pressure_values[number]), origin="lower")
+    plt.tight_layout()
+    plt.savefig("./temp_png_to_mp4/pressure_%i.png" % number)
+    plt.cla()
+
+
+def make_velocity_pictures(number):
+    plt.imshow(np.array(velocity_values[number][0]) +
+               np.array(velocity_values[number][1]), origin="lower")
+    plt.tight_layout()
+    plt.savefig("./temp_png_to_mp4/velocity_%i.png" % number)
+    plt.cla()
+
 
 filename = "LBM_data.hdf5"
 f = h5py.File(filename, 'r')
@@ -30,18 +47,9 @@ if 'raw data output configuration' in a_group_key:
 if not os.path.exists("temp_png_to_mp4"):
     os.makedirs("temp_png_to_mp4")
 
-for i in range(len(pressure_values)):
-    plt.imshow(np.array(pressure_values[i]), origin="lower")
-    plt.tight_layout()
-    plt.savefig("./temp_png_to_mp4/pressure_%i.png" % i)
-    plt.cla()
-
-for i in range(len(velocity_values)):
-    plt.imshow(np.array(velocity_values[i][0]) +
-               np.array(velocity_values[i][1]), origin="lower")
-    plt.tight_layout()
-    plt.savefig("./temp_png_to_mp4/velocity_%i.png" % i)
-    plt.cla()
+pool = Pool()
+pool.map(make_pressure_pictures, range(len(pressure_values)))
+pool.map(make_velocity_pictures, range(len(velocity_values)))
 
 if os.path.isfile("pressure.mp4"):
     print("file pressure.mp4 already exists. Please rename it and start again.")
@@ -54,7 +62,6 @@ if os.path.isfile("velocity.mp4"):
 else:
     os.system(
         "ffmpeg -f image2 -r 30 -i ./temp_png_to_mp4/velocity_%01d.png -pix_fmt yuv420p -c:v libx264 -vcodec mpeg4 -y ./velocity.mp4")
-
 
 for root, dirs, files in os.walk("temp_png_to_mp4", topdown=False):
     for name in files:
