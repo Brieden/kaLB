@@ -62,9 +62,9 @@ class Simulation():
         cylinder_y = obstacle_parameter["y-position"]
         cylinder_x = obstacle_parameter["x-position"]
         cylinder_r = obstacle_parameter["radius"]
-        return np.fromfunction(
-            lambda x, y: (-x + self.n_x - cylinder_x) ** 2 + (-y + self.n_y - cylinder_y) ** 2 < cylinder_r ** 2,
-            (self.n_x, self.n_y)).T
+        return (np.fromfunction(
+            lambda x, y: (- x + self.n_x -  cylinder_x) ** 2 + (- y + cylinder_y) ** 2 < cylinder_r ** 2,
+            (self.n_x, self.n_y)))
 
     def png_importer(self, png_path):
         """
@@ -72,10 +72,10 @@ class Simulation():
         :return:
         """
         try:
-            image = img.imread(png_path)[:, :, :-1].sum(axis=2)
+            image = np.rot90(np.flipud(img.imread(png_path)[:, :, :-1].sum(axis=2)))
         except IOError as error:
             print("ERROR: It was not possible to read the picture: " + str(png_path))
-
+            quit()
         if image.shape == self.shape:
             return image[:] < 1
         print("The shape of the picture %s does not match the shape of the simulation. "
@@ -106,7 +106,7 @@ class Simulation():
 
         self.obstacle = np.flip(self.obstacle, 0)
         if self.args.verbose:
-            plt.imshow(self.obstacle, origin='lower', cmap='Greys', interpolation='nearest')
+            plt.imshow(self.obstacle.T, origin='lower', cmap='Greys', interpolation='nearest')
             plt.show()
 
     def initialize_output(self, output_parameters):
@@ -160,7 +160,7 @@ class Simulation():
                 self.h5_pressure.create_dataset("%i" % step, data=self.rho)
         if self.picture_output:
             if step % self.picture_output_frequency == 0:
-                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]), origin='lower')
+                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]).T, origin='lower')
                 plt.savefig(self.args.output + self.picture_output_name + "%05i." % step + self.picture_output_typ)
 
     def initialize_from_json(self, inputfile, args):
@@ -188,7 +188,7 @@ class Simulation():
         self.args = args
 
         # für die Simulation benötigten Felder initialisieren
-        self.shape = (self.n_y, self.n_x)
+        self.shape = (self.n_x, self.n_y)
         self.rho = np.empty(shape=self.shape)
         self.vel = np.empty(shape=(2, self.shape[0], self.shape[1]))
         self.f_in = np.empty(shape=(9, self.shape[0], self.shape[1]))
