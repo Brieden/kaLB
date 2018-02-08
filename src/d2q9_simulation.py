@@ -65,6 +65,7 @@ class Simulation():
         cylinder_y = obstacle_parameter["y-position"]
         cylinder_x = obstacle_parameter["x-position"]
         cylinder_r = obstacle_parameter["radius"]
+
         return np.fromfunction(
             lambda x, y: (cylinder_x - x) ** 2 + (cylinder_y - y) ** 2 < cylinder_r ** 2,
             self.shape)
@@ -87,10 +88,10 @@ class Simulation():
         :return:
         """
         try:
-            image = img.imread(png_path)[:, :, :-1].sum(axis=2)
+            image = np.rot90(np.flipud(img.imread(png_path)[:, :, :-1].sum(axis=2)))
         except IOError as error:
             print("ERROR: It was not possible to read the picture: " + str(png_path))
-
+            quit()
         if image.shape == self.shape:
             return image[:] < 1
         print("The shape of the picture %s does not match the shape of the simulation. "
