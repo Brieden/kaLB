@@ -2,7 +2,7 @@
 	"simulation parameters" : {
 		"simulation name"	: "Plain Test",
     	"simulation id"		: "002",
-    	"time steps"		: 1000,
+    	"time steps"		: 100,
     	"lattice points x"	: 400,
     	"lattice points y"	: 300,
 		"Reynolds number"	: 400
@@ -32,6 +32,10 @@
           "type": "recktangle obstacle",
 		  "bottom_left": [100, 100],
 	  	  "top_right": [200, 150]
+        },
+		{
+          "type": "png import",
+	  	  "file name": "src/kaLB_4_3.png"
         }
     ],
 

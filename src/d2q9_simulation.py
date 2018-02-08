@@ -88,7 +88,8 @@ class Simulation():
         :return:
         """
         try:
-            image = np.rot90(np.flipud(img.imread(png_path)[:, :, :-1].sum(axis=2)))
+            image = img.imread(png_path)[:, :, :-1].sum(axis=2)
+            image = np.rot90(np.flipud(np.fliplr(image)))
         except IOError as error:
             print("ERROR: It was not possible to read the picture: " + str(png_path))
             quit()
