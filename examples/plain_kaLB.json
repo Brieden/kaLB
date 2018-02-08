@@ -1,0 +1,56 @@
+{
+	"simulation parameters" : {
+		"simulation name"	: "Plain Test",
+    	"simulation id"		: "002",
+    	"time steps"		: 1000,
+    	"lattice points x"	: 400,
+    	"lattice points y"	: 300,
+		"Reynolds number"	: 400
+	},
+
+	"boundary conditions" : {
+		"N" : {"type" : "bounce_back"},
+		"E" : {"type" : "outflow"},
+		"S" : {"type" : "bounce_back"},
+      	"W" : {"type" : "zou-he", "v_x" : 0.04, "v_y" : 0}
+    },
+
+	"obstacle parameters" : [
+        {
+		  "type": "cylindrical obstacle",
+		  "x-position": 300,
+		  "y-position": 250,
+	  	  "radius": 40
+        },
+        {
+          "type": "cylindrical obstacle",
+		  "x-position": 100,
+	  	  "y-position": 250,
+	  	  "radius": 10
+        },
+		{
+          "type": "recktangle obstacle",
+		  "bottom_left": [100, 100],
+	  	  "top_right": [200, 150]
+        }
+    ],
+
+	"output configuration"     : {
+		"picture output configuration": {
+			"file name": "LBM_pic_",
+			"file type": "png",
+			"output frequency": 50
+		},
+		"raw data output configuration": {
+			"file name": "LBM_raw_data",
+			"output frequency": 30,
+			"output data": {
+				"velocity": 1,
+				"pressure": 1
+			}
+		},
+		"snapshot": {
+			"output frequency": 1000
+		}
+	}
+}

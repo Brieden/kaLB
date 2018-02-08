@@ -26,15 +26,18 @@ class Simulation():
         [1, 1], [-1, 1], [-1, -1], [1, -1]
     ])
 
-    e_inverse = [0, 3, 4, 1, 2, 7, 8, 5, 6]
+    e_inverse = np.asarray([0, 3, 4, 1, 2, 7, 8, 5, 6])
 
     direction_sets = {
-        "N": np.arange(9)[np.asarray([e_i[1] > 0 for e_i in e])],
-        "E": np.arange(9)[np.asarray([e_i[0] > 0 for e_i in e])],
-        "S": np.arange(9)[np.asarray([e_i[1] < 0 for e_i in e])],
-        "W": np.arange(9)[np.asarray([e_i[0] < 0 for e_i in e])]
+        "N": np.asarray([i for i, e_i in enumerate(e) if e_i[1] > 0]),
+        "E": np.asarray([i for i, e_i in enumerate(e) if e_i[0] > 0]),
+        "S": np.asarray([i for i, e_i in enumerate(e) if e_i[1] < 0]),
+        "W": np.asarray([i for i, e_i in enumerate(e) if e_i[0] < 0])
     }
-
+    
+    vertical_indices = np.asarray([i for i, e_i in enumerate(e) if e_i[0] == 0])
+    horizontal_indices = np.asarray([i for i, e_i in enumerate(e) if e_i[1] == 0])
+    
     # weights
     w = np.array([
         4 / 9,
@@ -63,8 +66,20 @@ class Simulation():
         cylinder_x = obstacle_parameter["x-position"]
         cylinder_r = obstacle_parameter["radius"]
         return np.fromfunction(
-            lambda x, y: (-x + self.n_x - cylinder_x) ** 2 + (-y + self.n_y - cylinder_y) ** 2 < cylinder_r ** 2,
-            (self.n_x, self.n_y)).T
+            lambda x, y: (cylinder_x - x) ** 2 + (cylinder_y - y) ** 2 < cylinder_r ** 2,
+            self.shape)
+    
+    def recktangle_function(self, obstacle_parameter):
+        """
+
+        :param obstacle_parameter:
+        :return:
+        """
+        point1 = obstacle_parameter["bottom_left"]
+        point2 = obstacle_parameter["top_right"]
+        recktangle = np.full(shape=self.shape, fill_value=False)
+        recktangle[point1[0]:point2[0] + 1, point1[1]:point2[1] + 1] = True
+        return recktangle
 
     def png_importer(self, png_path):
         """
@@ -97,6 +112,9 @@ class Simulation():
             if obstacle_parameter["type"] == "cylindrical obstacle":
                 self.obstacle = np.logical_or(self.obstacle,
                                               self.cylinder_function(obstacle_parameter))
+            elif obstacle_parameter["type"] == "recktangle obstacle":
+                self.obstacle = np.logical_or(self.obstacle,
+                                              self.recktangle_function(obstacle_parameter))
             elif obstacle_parameter["type"] == "png import":
                 self.obstacle = np.logical_or(self.obstacle,
                                               self.png_importer(obstacle_parameter["file name"]))
@@ -104,9 +122,8 @@ class Simulation():
                 print("obstacle ", obstacle_parameter, "not recognised")
                 quit()
 
-        self.obstacle = np.flip(self.obstacle, 0)
         if self.args.verbose:
-            plt.imshow(self.obstacle, origin='lower', cmap='Greys', interpolation='nearest')
+            plt.imshow(self.obstacle.T, origin='lower', cmap='Greys', interpolation='nearest')
             plt.show()
 
     def initialize_output(self, output_parameters):
@@ -160,7 +177,7 @@ class Simulation():
                 self.h5_pressure.create_dataset("%i" % step, data=self.rho)
         if self.picture_output:
             if step % self.picture_output_frequency == 0:
-                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]), origin='lower')
+                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]).T, origin='lower')
                 plt.savefig(self.args.output + self.picture_output_name + "%05i." % step + self.picture_output_typ)
 
     def initialize_from_json(self, inputfile, args):
@@ -188,7 +205,7 @@ class Simulation():
         self.args = args
 
         # für die Simulation benötigten Felder initialisieren
-        self.shape = (self.n_y, self.n_x)
+        self.shape = (self.n_x, self.n_y)
         self.rho = np.empty(shape=self.shape)
         self.vel = np.empty(shape=(2, self.shape[0], self.shape[1]))
         self.f_in = np.empty(shape=(9, self.shape[0], self.shape[1]))
@@ -196,19 +213,48 @@ class Simulation():
         self.f_out = np.empty_like(self.f_in)
 
         self.obstacles_definition(inputfile["obstacle parameters"])
-
-        # als nächstes müssen die einstellungen für die boundary-condition
-        # ausgelesen werden.
-        # hier fehlt mir allerdings noch eine gute idee wie.
-        # 1) passen die boundary conditions zusammen? (periodic)
-        # 2) anpassen der obstacle-matrix für bounce-back?
-        # 3) falls Zou-He: wie soll die kante behandelt werden?
-        boundary_conditions = inputfile["boundary conditions"]
+        
+        self.set_boundary_conditions(inputfile["boundary conditions"])
 
         # umgang mit den output-parametern:
         # also alles was mit speichern, plotten,
         # oder ausgabe während des programms zu tun hat
         self.initialize_output(inputfile["output configuration"])
+
+    def set_boundary_conditions(self, boundary_conditions):
+        directions = np.array(["N", "E", "S", "W"])
+        self.opposite_directions = {"N": "S", "E": "W", "S": "N", "W": "E"}
+        self.last_indices = {"N": (-1,-2), "E": (-1,-2), "S": (0,1), "W": (0,1)}
+        self.boundarys = {}
+        self.zou_he_conditions = {}
+        
+        # TODO zeug
+        for direction in directions:
+            bc = boundary_conditions[direction]
+            if bc["type"] == "periodic":
+                oppo_bc = boundary_conditions[self.opposite_directions[direction]]
+                if oppo_bc["type"] == "periodic":
+                    self.boundarys[direction] = "periodic"
+                else:
+                    print("ERROR: Periodic boundary conditions do not match")
+                    quit()
+            elif bc["type"] == "bounce_back":
+                self.boundarys[direction] = "bounce_back"                
+                if direction == "N" or direction == "S":
+                    self.obstacle[:, self.last_indices[direction][0]] = True
+                elif direction == "E" or direction == "W":
+                    self.obstacle[self.last_indices[direction][0], :] = True
+                else:
+                    print("ERROR: This state should be impossible!")
+                    quit()
+            elif bc["type"] == "outflow":
+                self.boundarys[direction] = "outflow"
+            elif bc["type"] == "zou-he":
+                self.boundarys[direction] = "zou-he"
+                self.zou_he_conditions[direction] = (bc["v_x"], bc["v_y"])
+            else:
+                print("ERROR: Boundary condition does not exist or is missing")
+                quit()
 
     def progress_bar(self, value, endvalue, bar_length=50):
         """
@@ -306,7 +352,30 @@ class Simulation():
         and calculate according density at given border.
         """
         # TODO fulfill docstring
-        pass
+        for direction, condition in self.boundarys.items():
+            if condition == "zou-he":
+                
+                last = self.last_indices[direction][0]
+                v_x, v_y = self.zou_he_conditions[direction]
+                direction_indices = self.direction_sets[direction]
+
+                if direction == "N" or direction == "S":
+                    self.vel[0, :, last] = v_x
+                    self.vel[1, :, last] = v_y
+
+                    f1 = np.sum(self.f_in[self.horizontal_indices, :, last], axis=0)
+                    f2 = np.sum(self.f_in[direction_indices, :, last], axis=0)
+
+                    self.rho[:, last] = f1 + (2 * f2) / (1 - self.vel[1, :, last])
+
+                elif direction == "E" or direction == "W":
+                    self.vel[0, last, :] = v_x
+                    self.vel[1, last, :] = v_y
+
+                    f1 = np.sum(self.f_in[self.vertical_indices, last, :], axis=0)
+                    f2 = np.sum(self.f_in[direction_indices, last, :], axis=0)
+
+                    self.rho[last, :] = f1 + (2 * f2) / (1 - self.vel[0, last, :])
 
     def correct_distr_func(self):
         """
@@ -317,7 +386,26 @@ class Simulation():
         for incoming components of the distribution function using Zou-He.
         """
         # TODO fulfill docstring
-        pass
+        for direction, condition in self.boundarys.items():
+            if condition == "zou-he":
+
+                last = self.last_indices[direction][0]                
+                opposite_direction = self.opposite_directions[direction]
+                opposite_direction_indices = self.direction_sets[opposite_direction]
+                matching_direction_indices = self.e_inverse[opposite_direction_indices]
+
+                if direction == "N" or direction == "S":
+                    self.f_in[opposite_direction_indices, :, last] = (
+                        self.f_eq[opposite_direction_indices, :, last]
+                        + self.f_in[matching_direction_indices, :, last]
+                        - self.f_eq[matching_direction_indices, :, last]
+                    )
+                elif direction == "E" or direction == "W":
+                    self.f_in[opposite_direction_indices, last, :] = (
+                        self.f_eq[opposite_direction_indices, last, :]
+                        + self.f_in[matching_direction_indices, last, :]
+                        - self.f_eq[matching_direction_indices, last, :]
+                    )
 
     def bounce_back(self):
         """
@@ -346,7 +434,17 @@ class Simulation():
         with second to last entries from that same distribution function.
         """
         # TODO fulfill docstring
-        self.f_in[(6, 3, 7), -1] = self.f_in[(6, 3, 7), -2]
+        for direction, condition in self.boundarys.items():
+            if condition == "outflow":
+
+                opposite_direction = self.opposite_directions[direction]
+                opposite_direction_indices = self.direction_sets[opposite_direction]
+                last, second_to_last = self.last_indices[direction]
+
+                if direction == "N" or direction == "S":
+                    self.f_in[opposite_direction_indices, :, last] = self.f_in[opposite_direction_indices, :, second_to_last]
+                elif direction == "E" or direction == "W":
+                    self.f_in[opposite_direction_indices, last, :] = self.f_in[opposite_direction_indices, second_to_last, :]
 
     def do_simulation_step(self, step):
         self.calc_macroscopic()
@@ -366,7 +464,10 @@ class Simulation():
         # die 3 zeilen sollten also langfristig nicht hier,
         # sondern beim initialisieren stehen....
         self.vel[:] = 0
-        self.vel[0, 0, :] = 0.04
+#        self.vel[0, 1, :] = 0.04 # links nach rechts
+#        self.vel[0, -1, :] = -0.04 # rechts nach links
+        self.vel[1, :, 0] = 0.04 # unten nach oben
+#        self.vel[1, :, -1] = -0.04 # oben nach unten
         self.rho[:] = 1
 
         # errechne ein initiales f_in.
