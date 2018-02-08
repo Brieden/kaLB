@@ -54,7 +54,7 @@ class Simulation():
         self.is_initialized = False
         # tau ist hier erstmal nur ein platzhalter und sollte sattdessen
         # in der initialize_from_json funktion aus reynolds berechnet werden.
-        self.tau = 10
+        self.tau = 0.1
 
     def cylinder_function(self, obstacle_parameter):
         """
@@ -179,8 +179,9 @@ class Simulation():
                 self.h5_pressure.create_dataset("%i" % step, data=self.rho)
         if self.picture_output:
             if step % self.picture_output_frequency == 0:
-                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]).T, origin='lower')
+                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]).T, origin='lower',vmin=0,vmax=0.004)
                 plt.savefig(self.args.output + self.picture_output_name + "%05i." % step + self.picture_output_typ)
+                plt.cla()
 
     def initialize_from_json(self, inputfile, args):
         """
@@ -468,7 +469,7 @@ class Simulation():
         self.vel[:] = 0
 #        self.vel[0, 1, :] = 0.04 # links nach rechts
 #        self.vel[0, -1, :] = -0.04 # rechts nach links
-        self.vel[1, :, 0] = 0.04 # unten nach oben
+#        self.vel[1, :, 0] = 0.04 # unten nach oben
 #        self.vel[1, :, -1] = -0.04 # oben nach unten
         self.rho[:] = 1
 
