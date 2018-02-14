@@ -19,20 +19,16 @@
 
 	"output configuration"     : {
 		"picture output configuration": {
-			"file name": "LBM_pic_",
+			"file name": "Kasten_pic_",
 			"file type": "png",
 			"output frequency": 500
 		},
 		"raw data output configuration": {
-			"file name": "LBM_raw_data",
-			"output frequency": 30,
-			"output data": {
-				"velocity": 1,
-				"pressure": 1
-			}
+			"file name": "Kasten_raw_data",
+			"output frequency": 30
 		},
 		"snapshot": {
-			"output frequency": 1000
+			"output frequency": 10000
 		}
 	}
 }

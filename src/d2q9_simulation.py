@@ -13,6 +13,7 @@ import matplotlib.image as img
 import sys
 import os
 import h5py
+import time
 
 
 class Simulation():
@@ -34,10 +35,10 @@ class Simulation():
         "S": np.asarray([i for i, e_i in enumerate(e) if e_i[1] < 0]),
         "W": np.asarray([i for i, e_i in enumerate(e) if e_i[0] < 0])
     }
-    
+
     vertical_indices = np.asarray([i for i, e_i in enumerate(e) if e_i[0] == 0])
     horizontal_indices = np.asarray([i for i, e_i in enumerate(e) if e_i[1] == 0])
-    
+
     # weights
     w = np.array([
         4 / 9,
@@ -69,7 +70,7 @@ class Simulation():
         return np.fromfunction(
             lambda x, y: (cylinder_x - x) ** 2 + (cylinder_y - y) ** 2 < cylinder_r ** 2,
             self.shape)
-    
+
     def recktangle_function(self, obstacle_parameter):
         """
 
@@ -160,10 +161,8 @@ class Simulation():
             h5file = h5py.File(self.args.output + raw_parameter["file name"]
                                + ".hdf5", "w")
             h5_output = h5file.create_group("raw data output configuration")
-            if raw_parameter["output data"]["velocity"] == 1:
-                self.h5_velocity = h5_output.create_group("velocity")
-            if raw_parameter["output data"]["pressure"] == 1:
-                self.h5_pressure = h5_output.create_group("pressure")
+            self.h5_velocity = h5_output.create_group("velocity")
+            self.h5_pressure = h5_output.create_group("pressure")
 
     def store_output(self, step):
         """
@@ -179,7 +178,8 @@ class Simulation():
                 self.h5_pressure.create_dataset("%i" % step, data=self.rho)
         if self.picture_output:
             if step % self.picture_output_frequency == 0:
-                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]).T, origin='lower',vmin=0,vmax=0.004)
+                plt.imshow((self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]).T, origin='lower', vmin=0,
+                           vmax=0.004)
                 plt.savefig(self.args.output + self.picture_output_name + "%05i." % step + self.picture_output_typ)
                 plt.cla()
 
@@ -216,7 +216,7 @@ class Simulation():
         self.f_out = np.empty_like(self.f_in)
 
         self.obstacles_definition(inputfile["obstacle parameters"])
-        
+
         self.set_boundary_conditions(inputfile["boundary conditions"])
 
         # umgang mit den output-parametern:
@@ -227,10 +227,10 @@ class Simulation():
     def set_boundary_conditions(self, boundary_conditions):
         directions = np.array(["N", "E", "S", "W"])
         self.opposite_directions = {"N": "S", "E": "W", "S": "N", "W": "E"}
-        self.last_indices = {"N": (-1,-2), "E": (-1,-2), "S": (0,1), "W": (0,1)}
+        self.last_indices = {"N": (-1, -2), "E": (-1, -2), "S": (0, 1), "W": (0, 1)}
         self.boundarys = {}
         self.zou_he_conditions = {}
-        
+
         # TODO zeug
         for direction in directions:
             bc = boundary_conditions[direction]
@@ -242,7 +242,7 @@ class Simulation():
                     print("ERROR: Periodic boundary conditions do not match")
                     quit()
             elif bc["type"] == "bounce_back":
-                self.boundarys[direction] = "bounce_back"                
+                self.boundarys[direction] = "bounce_back"
                 if direction == "N" or direction == "S":
                     self.obstacle[:, self.last_indices[direction][0]] = True
                 elif direction == "E" or direction == "W":
@@ -266,12 +266,13 @@ class Simulation():
         :param bar_length:
         :return:
         """
-        percent = float(value) / endvalue
-        arrow = '-' * int(round(percent * bar_length) - 1) + '>'
-        spaces = ' ' * (bar_length - len(arrow))
+        if value % 100 == 0:
+            percent = float(value) / endvalue
+            arrow = '-' * int(round(percent * bar_length) - 1) + '>'
+            spaces = ' ' * (bar_length - len(arrow))
 
-        sys.stdout.write("\rPercent: [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
-        sys.stdout.flush()
+            sys.stdout.write("\rPercent: [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
+            sys.stdout.flush()
 
     def calc_macroscopic(self):
         """
@@ -357,7 +358,7 @@ class Simulation():
         # TODO fulfill docstring
         for direction, condition in self.boundarys.items():
             if condition == "zou-he":
-                
+
                 last = self.last_indices[direction][0]
                 v_x, v_y = self.zou_he_conditions[direction]
                 direction_indices = self.direction_sets[direction]
@@ -392,22 +393,22 @@ class Simulation():
         for direction, condition in self.boundarys.items():
             if condition == "zou-he":
 
-                last = self.last_indices[direction][0]                
+                last = self.last_indices[direction][0]
                 opposite_direction = self.opposite_directions[direction]
                 opposite_direction_indices = self.direction_sets[opposite_direction]
                 matching_direction_indices = self.e_inverse[opposite_direction_indices]
 
                 if direction == "N" or direction == "S":
                     self.f_in[opposite_direction_indices, :, last] = (
-                        self.f_eq[opposite_direction_indices, :, last]
-                        + self.f_in[matching_direction_indices, :, last]
-                        - self.f_eq[matching_direction_indices, :, last]
+                            self.f_eq[opposite_direction_indices, :, last]
+                            + self.f_in[matching_direction_indices, :, last]
+                            - self.f_eq[matching_direction_indices, :, last]
                     )
                 elif direction == "E" or direction == "W":
                     self.f_in[opposite_direction_indices, last, :] = (
-                        self.f_eq[opposite_direction_indices, last, :]
-                        + self.f_in[matching_direction_indices, last, :]
-                        - self.f_eq[matching_direction_indices, last, :]
+                            self.f_eq[opposite_direction_indices, last, :]
+                            + self.f_in[matching_direction_indices, last, :]
+                            - self.f_eq[matching_direction_indices, last, :]
                     )
 
     def bounce_back(self):
@@ -445,9 +446,11 @@ class Simulation():
                 last, second_to_last = self.last_indices[direction]
 
                 if direction == "N" or direction == "S":
-                    self.f_in[opposite_direction_indices, :, last] = self.f_in[opposite_direction_indices, :, second_to_last]
+                    self.f_in[opposite_direction_indices, :, last] = self.f_in[opposite_direction_indices, :,
+                                                                     second_to_last]
                 elif direction == "E" or direction == "W":
-                    self.f_in[opposite_direction_indices, last, :] = self.f_in[opposite_direction_indices, second_to_last, :]
+                    self.f_in[opposite_direction_indices, last, :] = self.f_in[opposite_direction_indices,
+                                                                     second_to_last, :]
 
     def do_simulation_step(self, step):
         self.calc_macroscopic()
@@ -467,10 +470,10 @@ class Simulation():
         # die 3 zeilen sollten also langfristig nicht hier,
         # sondern beim initialisieren stehen....
         self.vel[:] = 0
-#        self.vel[0, 1, :] = 0.04 # links nach rechts
-#        self.vel[0, -1, :] = -0.04 # rechts nach links
-#        self.vel[1, :, 0] = 0.04 # unten nach oben
-#        self.vel[1, :, -1] = -0.04 # oben nach unten
+        #        self.vel[0, 1, :] = 0.04 # links nach rechts
+        #        self.vel[0, -1, :] = -0.04 # rechts nach links
+        #        self.vel[1, :, 0] = 0.04 # unten nach oben
+        #        self.vel[1, :, -1] = -0.04 # oben nach unten
         self.rho[:] = 1
 
         # errechne ein initiales f_in.
@@ -480,8 +483,13 @@ class Simulation():
         # für den moment ist das aber erstmal okay so.
         self.calc_equilibrium()
         self.f_in = self.f_eq
-
+        t_0 = time.time()
         for step in range(self.timesteps):
             self.do_simulation_step(step)
-            if self.args.verbose:
-                self.progress_bar(step, self.timesteps)
+            self.progress_bar(step, self.timesteps)
+
+        if self.args.verbose:
+            print("\n Performance feedback: \n"
+                  "%i steps in %2.f seconds with %.2f M su/s"
+                  % (self.timesteps, time.time() - t_0,
+                     self.n_x * self.n_y * self.timesteps * 1e-6 / (time.time() - t_0)))

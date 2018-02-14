@@ -8,27 +8,17 @@
 		"Reynolds number": 400
 	},
 	"boundary conditions": {
-		"N": {
-			"type": "bounce_back"
-		},
-		"E": {
-			"type": "outflow"
-		},
-		"S": {
-			"type": "bounce_back"
-		},
-		"W": {
-			"type": "zou-he",
-			"v_x": 0.04,
-			"v_y": 0
-		}
+		"N": {"type": "bounce_back"},
+		"E": {"type": "outflow"},
+		"S": {"type": "bounce_back"},
+		"W": {"type": "zou-he", "v_x": 0.04, "v_y": 0}
 	},
 	"obstacle parameters": [],
 
 	"output configuration": {
 		"raw data output configuration": {
 			"file name": "system_test",
-			"output frequency": 100
+			"output frequency": 1000
 		}
 	}
 }
