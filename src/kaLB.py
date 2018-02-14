@@ -6,6 +6,7 @@ kaLB = kaum ausgereiftes Lattice Boltzmann
 import json
 import argparse
 from d2q9_simulation import Simulation
+from utilities import *
 
 
 def open_json(filename):
@@ -44,6 +45,10 @@ def parse_arguments():
         '-v', '--verbose', required=False, action='store_true',
         help="With this command, you can activate an issue of many hints."
     )
+    parser.add_argument(
+        '-t', '--test', required=False, action='store_true',
+        help="With this command, you can start a systemtest"
+    )
 
     return parser.parse_args()
 
@@ -53,12 +58,17 @@ def main():
     Function
     """
     args = parse_arguments()
+    if args.test:
+        args.input = "./../examples/system_test.json"
+
     input_file = args.input
     data = open_json(input_file)
 
     sim = Simulation()
     sim.initialize_from_json(data, args)
     sim.run_simulation()
+    if args.test:
+        system_test(args)
 
 
 if __name__ == '__main__':
