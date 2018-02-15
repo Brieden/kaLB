@@ -49,6 +49,10 @@ def parse_arguments():
         '-t', '--test', required=False, action='store_true',
         help="With this command, you can start a systemtest"
     )
+    parser.add_argument(
+        '-s', '--snapshot', required=False, type=str,
+        help="Specify path to the existing snapshot that you want to use as initial condition."
+    )
 
     return parser.parse_args()
 

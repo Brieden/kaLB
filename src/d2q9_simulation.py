@@ -475,14 +475,15 @@ class Simulation():
         #        self.vel[1, :, 0] = 0.04 # unten nach oben
         #        self.vel[1, :, -1] = -0.04 # oben nach unten
         self.rho[:] = 1
-
-        # errechne ein initiales f_in.
-        # hier sollte langfristig auch die möglichkeit existieren
-        # eine rehcnung mit einem existierenden f_in
-        # fortzusetzen oder zu starten!
-        # für den moment ist das aber erstmal okay so.
         self.calc_equilibrium()
         self.f_in = self.f_eq
+        if self.args.snapshot:
+            try:
+                self.f_in = np.load(self.args.snapshot)
+                self.bounce_back()
+            except IOError as error:
+                print("Error: could not open snapshot-file. Simulation was aborted.")
+                quit()
         t_0 = time.time()
         for step in range(self.timesteps):
             self.do_simulation_step(step)
