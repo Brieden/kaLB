@@ -1,0 +1,34 @@
+{
+	"simulation parameters": {
+		"simulation name" : "Lid Driven Cavity",
+    	"simulation id"	  : "001",
+    	"time steps"	  : 20000,
+    	"lattice points x": 200,
+    	"lattice points y": 200,
+		"tau"			  : 1
+	},
+
+	"boundary conditions": {
+		"N": {"type": "zou-he", "v_x": 0.2, "v_y": 0},
+		"E": {"type": "bounce_back"},
+		"S": {"type": "bounce_back"},
+      	"W": {"type": "bounce_back"}
+    },
+
+	"obstacle parameters": [],
+
+	"output configuration": {
+		"picture output configuration": {
+			"file name"       : "Lid_Driven_Cavity_pic_",
+			"file type"       : "png",
+			"output frequency": 500
+		},
+		"raw data output configuration": {
+			"file name"       : "Lid_Driven_Cavity_raw_data",
+			"output frequency": 30
+		},
+		"snapshot": {
+			"output frequency": 10000
+		}
+	}
+}

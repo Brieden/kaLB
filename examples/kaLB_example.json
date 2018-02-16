@@ -1,50 +1,50 @@
 {
-	"simulation parameters" : {
-		"simulation name"	: "kaLB example",
-    	"simulation id"		: "001",
-    	"time steps"		: 3000,
-    	"lattice points x"	: 400,
-    	"lattice points y"	: 300,
-		"Reynolds number"	: 400
+	"simulation parameters": {
+		"simulation name" : "kaLB_example",
+    	"simulation id"	  : "001",
+    	"time steps"	  : 10000,
+    	"lattice points x": 400,
+    	"lattice points y": 300,
+		"tau"	          : 1
 	},
 
 	"boundary conditions" : {
-		"N" : {"type" : "bounce_back"},
-		"E" : {"type" : "outflow"},
-		"S" : {"type" : "bounce_back"},
-      	"W" : {"type" : "zou-he", "v_x" : 0.04, "v_y" : 0}
+		"N": {"type": "bounce_back"},
+		"E": {"type": "outflow"},
+		"S": {"type": "bounce_back"},
+      	"W": {"type": "zou-he", "v_x" : 0.08, "v_y" : 0}
     },
 
-	"obstacle parameters" : [
+	"obstacle parameters": [
         {
-          "type": "cylindrical obstacle",
+          "type"      : "cylindrical obstacle",
 		  "x-position": 150,
 	  	  "y-position": 230,
-	  	  "radius": 30
+	  	  "radius"    : 30
         },
 		{
-          "type": "recktangle obstacle",
-		  "bottom_left": [50, 25],
-	  	  "top_right": [350, 35]
+          "type"       : "recktangle obstacle",
+		  "bottom_left": [ 50, 25],
+	  	  "top_right"  : [350, 35]
         },
 		{
-          "type": "png import",
+          "type"     : "png import",
 	  	  "file name": "kaLB_4_3.png"
         }
     ],
 
-	"output configuration"     : {
+	"output configuration": {
 		"picture output configuration": {
-			"file name": "LBM_pic_",
-			"file type": "png",
+			"file name"       : "kaLB_example_pic_",
+			"file type"       : "png",
 			"output frequency": 500
 		},
 		"raw data output configuration": {
-			"file name": "LBM_raw_data",
+			"file name"       : "kaLB_example_raw_data",
 			"output frequency": 30
 		},
 		"snapshot": {
-			"output frequency": 1000
+			"output frequency": 5000
 		}
 	}
 }

@@ -1,23 +1,25 @@
 {
 	"simulation parameters": {
-		"simulation name": "flow in the pipe",
-		"simulation id": "001",
-		"time steps": 1001,
+		"simulation name" : "flow in the pipe",
+		"simulation id"	  : "001",
+		"time steps"	  : 1001,
 		"lattice points x": 200,
 		"lattice points y": 50,
-		"Reynolds number": 400
+		"tau"			  : 400
 	},
+
 	"boundary conditions": {
 		"N": {"type": "bounce_back"},
 		"E": {"type": "outflow"},
 		"S": {"type": "bounce_back"},
 		"W": {"type": "zou-he", "v_x": 0.04, "v_y": 0}
 	},
+
 	"obstacle parameters": [],
 
 	"output configuration": {
 		"raw data output configuration": {
-			"file name": "system_test",
+			"file name"       : "system_test",
 			"output frequency": 1000
 		}
 	}

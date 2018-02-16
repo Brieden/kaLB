@@ -66,10 +66,10 @@ def main():
         args.input = "./../examples/system_test.json"
 
     input_file = args.input
-    data = open_json(input_file)
+    json_file = open_json(input_file)
 
-    sim = Simulation()
-    sim.initialize_from_json(data, args)
+    sim = Simulation(json_file, args)
+#    sim.initialize_from_json(data, args)
     sim.run_simulation()
     if args.test:
         utilities.system_test(args)
@@ -77,4 +77,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    print("Ende Gelände ")
+    print("\nEnde Gelände ")
