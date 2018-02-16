@@ -5,8 +5,8 @@ kaLB = kaum ausgereiftes Lattice Boltzmann
 """
 import json
 import argparse
-from d2q9_simulation import Simulation
-from utilities import *
+from src.d2q9_simulation import Simulation
+from src import utilities
 
 
 def open_json(filename):
@@ -72,7 +72,7 @@ def main():
     sim.initialize_from_json(data, args)
     sim.run_simulation()
     if args.test:
-        system_test(args)
+        utilities.system_test(args)
 
 
 if __name__ == '__main__':

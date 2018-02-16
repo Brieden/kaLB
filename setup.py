@@ -10,10 +10,13 @@ setup(
     keywords='lbm fluid cfd lattice boltzmann computational',
     packages=['src'],
     long_description='not sure what to put here', # TODO verweis auf README???
-    install_requires=['numpy >= 1.13.3'],
+    install_requires=[
+	'numpy >= 1.13.3',
+	'h5py >= 2.7.1',
+	'matplotlib >= 2.1.1'
+    ],
     extras_require={
         'doc': ['Sphinx >= 1.6.5'],
-        'visualization': ['matplotlib >= 1.3.1'],
     },
     classifiers=[
         'Programming Language :: Python :: 3',
