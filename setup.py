@@ -9,6 +9,7 @@ setup(
     description='A python Lattice Boltzmann (LBM) simulation',
     keywords='lbm fluid cfd lattice boltzmann computational',
     packages=['src'],
+    test_suite='test',
     long_description='not sure what to put here', # TODO verweis auf README???
     install_requires=[
 	'numpy >= 1.13.3',
