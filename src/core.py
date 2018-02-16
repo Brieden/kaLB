@@ -13,6 +13,7 @@ def initialize():
     """
     Function
     """
+    print("hello world")
     return
 
 
