@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 from multiprocessing import Pool
 import numpy as np
 import argparse
 import h5py
 import os
 
+# Set final layout and higher resolution
 plt.style.use('bmh')
 plt.rcParams['figure.figsize'] = (16.0, 9.0)
-
 
 def parse_arguments():
     """
     Parse commandline arguments.
-    :return: args
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -23,6 +23,8 @@ def parse_arguments():
 
 
 def make_density_pictures(number):
+    """
+    """
     plt.imshow(np.array(density_values[number]).T, origin="lower")
     plt.title("t = %i" % velocity_names[number])
     plt.xlabel("x")
@@ -34,7 +36,8 @@ def make_density_pictures(number):
 
 def make_velocity_pictures(number):
     plt.imshow(np.sqrt(np.array(velocity_values[number][0])**2 +
-                np.array(velocity_values[number][1])**2).T, origin="lower")
+                np.array(velocity_values[number][1])**2).T,
+               norm=LogNorm(vmin=1e-3, vmax=1e-1), origin="lower")
     plt.title("t = %i" % velocity_names[number])
     plt.xlabel("x")
     plt.ylabel("y")
@@ -74,22 +77,27 @@ if not os.path.exists("temp_png_to_mp4"):
     os.makedirs("temp_png_to_mp4")
 
 pool = Pool()
+print("\n Start building density pictures: 0% done \n")
 pool.map(make_density_pictures, range(len(density_values)))
+print("\n Start building velocity pictures: 40% done \n")
 pool.map(make_velocity_pictures, range(len(velocity_values)))
 
-if os.path.isfile("density.mp4"):
+if os.path.isfile("clip_density.mp4"):
     print("file density.mp4 already exists. Please rename it and start again.")
 else:
+    print("\n Start building density video: 80% done \n")
     os.system(
-        "ffmpeg -r 30 -i ./temp_png_to_mp4/density_%01d.png -vb 10M ./density.mp4")
+        "ffmpeg -r 30 -i ./temp_png_to_mp4/density_%01d.png -vb 10M ./clip_density.mp4")
 
-if os.path.isfile("velocity.mp4"):
+if os.path.isfile("clip_velocity.mp4"):
     print("file velocity.mp4 already exists. Please rename it and start again.")
 else:
+    print("\n Start building velocity video: 90% done \n")
     os.system(
-        "ffmpeg -r 30 -i ./temp_png_to_mp4/velocity_%01d.png -vb 10M ./velocity.mp4")
+        "ffmpeg -r 30 -i ./temp_png_to_mp4/velocity_%01d.png -vb 10M ./clip_velocity.mp4")
 
 for root, dirs, files in os.walk("temp_png_to_mp4", topdown=False):
     for name in files:
         os.remove(os.path.join(root, name))
 os.rmdir("temp_png_to_mp4")
+print("\n Everything ready: 100% done \n")

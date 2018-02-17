@@ -12,19 +12,19 @@
 		"N": {"type": "bounce_back"},
 		"E": {"type": "outflow"},
 		"S": {"type": "bounce_back"},
-      	"W": {"type": "zou-he", "v_x" : 0.08, "v_y" : 0}
+      	"W": {"type": "zou-he", "v_x" : 0.04, "v_y" : 0}
     },
 
 	"obstacle parameters": [
         {
           "type"      : "cylindrical obstacle",
-		  "x-position": 150,
-	  	  "y-position": 230,
-	  	  "radius"    : 30
+		  "x-position": 325,
+	  	  "y-position": 160,
+	  	  "radius"    : 60
         },
 		{
           "type"       : "recktangle obstacle",
-		  "bottom_left": [ 50, 25],
+		  "bottom_left": [ 50, 30],
 	  	  "top_right"  : [350, 35]
         },
 		{
