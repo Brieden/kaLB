@@ -29,7 +29,7 @@
         },
 		{
           "type"     : "png import",
-	  	  "file name": "kaLB_4_3.png"
+	  	  "file name": "../examples/kaLB_logo.png"
         }
     ],
 
