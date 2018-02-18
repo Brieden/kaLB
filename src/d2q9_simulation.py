@@ -13,7 +13,10 @@ class Simulation():
     """
     Simulation class
     
-    Class to hold Simulation state and perform simulation
+    Class to hold Simulation state and perform simulation.
+    It also holds calss variables that are necessary for a d2q9 simulation;
+    these are shared by all instances.
+    initialization methods for json-input are outsourced to utilities.
     """
     # directions
     e = np.array([
@@ -22,8 +25,10 @@ class Simulation():
         [1, 1], [-1, 1], [-1, -1], [1, -1]
     ])
 
+    # indices to get inverse directions: " e[e_inverse] = -e "
     e_inverse = np.asarray([0, 3, 4, 1, 2, 7, 8, 5, 6])
 
+    # indices grouped by directions -> 3 indices per cardinal direction
     direction_sets = {
         "N": np.asarray([i for i, e_i in enumerate(e) if e_i[1] > 0]),
         "E": np.asarray([i for i, e_i in enumerate(e) if e_i[0] > 0]),
@@ -31,23 +36,52 @@ class Simulation():
         "W": np.asarray([i for i, e_i in enumerate(e) if e_i[0] < 0])
     }
 
+    # indices grouped by having 'no x' or 'no y' component
     vertical_indices = np.asarray([i for i, e_i in enumerate(e) if e_i[0] == 0])
     horizontal_indices = np.asarray([i for i, e_i in enumerate(e) if e_i[1] == 0])
 
-    # weights
+    # weights according to directions
     w = np.array([
         4 / 9,
         1 / 9, 1 / 9, 1 / 9, 1 / 9,
         1 / 36, 1 / 36, 1 / 36, 1 / 36
     ])
 
-    def __init__(self, inputfile, args):
+    def __init__(self, inputfile=None, args=None):
+        """
+        Initialize an instance of Simulation
+        
+        Checks for arguments.
+        Start initialization if both arguments are given.
+        Create mockup object for testing purposes if nothing is given.
 
-        self.args = args
-        utilities.simulation_parameters_definition(self, inputfile["simulation parameters"])
-        utilities.obstacles_definition(self, inputfile["obstacle parameters"])
-        utilities.set_boundary_conditions(self, inputfile["boundary conditions"])
-        utilities.initialize_output(self, inputfile["output configuration"])
+        :param inputfile:
+            an already opened .json file that specifies simulation parameters
+
+        :param args:
+            commandline arguments that are given to kaLB
+        """
+        
+        # inputfile and argumends are given -> initialize properly
+        if (inputfile != None) and (args != None):
+            self.is_mockup = False
+            
+            self.args = args
+            utilities.simulation_parameters_definition(self, inputfile["simulation parameters"])
+            utilities.obstacles_definition(self, inputfile["obstacle parameters"])
+            utilities.set_boundary_conditions(self, inputfile["boundary conditions"])
+            utilities.initialize_output(self, inputfile["output configuration"])
+
+        # create mockup Simulation
+        elif (inputfile == None) and (args == None):
+            self.is_mockup = True        
+
+        # Error
+        else:
+            print(
+                "ERROR: inputfile and args should be given for initialization"
+            )
+            quit()
 
     def calc_macroscopic(self):
         """

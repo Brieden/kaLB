@@ -20,7 +20,7 @@ class test_Simulation(unittest.TestCase):
         and mockup a dummy Simulation.
         """
         self.nx, self.ny = 500, 500
-        self.test_sim = Simulation()  # TODO adapt for __init__ change in 2dq9
+        self.test_sim = Simulation()
         self.test_sim.f_in = -np.random.uniform(1, 0, (9, self.nx, self.ny))
         self.test_sim.rho = -np.random.uniform(-1, 0, (self.nx, self.ny))
         self.test_sim.vel = np.random.normal(0, 0.02, (2, self.nx, self.ny))

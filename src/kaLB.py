@@ -68,7 +68,7 @@ def main():
     input_file = args.input
     json_file = open_json(input_file)
 
-    sim = Simulation(json_file, args)
+    sim = Simulation(inputfile=json_file, args=args)
     sim.run_simulation()
     if args.test:
         utilities.system_test(args)
