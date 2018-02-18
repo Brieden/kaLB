@@ -6,7 +6,7 @@
 		"step offset"     : 0,
 		"lattice points x": 200,
 		"lattice points y": 50,
-		"tau"			  : 400
+		"tau"             : 400
 	},
 
 	"boundary conditions": {
