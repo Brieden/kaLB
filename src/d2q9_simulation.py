@@ -11,7 +11,9 @@ import time
 
 class Simulation():
     """
-    Docstring
+    Simulation class
+    
+    Class to hold Simulation state and perform simulation
     """
     # directions
     e = np.array([
@@ -64,71 +66,15 @@ class Simulation():
         self.rho = np.sum(self.f_in, axis=0)
         self.vel = np.dot(self.e.T, self.f_in.transpose((1, 0, 2))) / self.rho
 
-    def calc_equilibrium(self):
-        """
-        Calculate equilibrium distribution fuction :math:`f_{eq}`.
-
-        Take macroscopic density :math:`\\rho` and velocity :math:`\\vec{u}`
-        together with direction-vectors :math:`\\vec{e}_i`
-        and their according weight-vectors :math:`w_i`
-        to calculate equilibrium distribution fuction :math:`f_{eq}`
-        using Bhatnagar-Gross-Krook (BGK) collision, with :math:`c = 1`:
-
-            .. math::
-                f_i^{eq}(\\vec{x}) = w_i\\rho(\\vec{x}) * \\left(
-                1
-                + 3 \\frac{(\\vec{e}_i * \\vec{u})}{c}
-                + \\frac{9}{2} \\frac{(\\vec{e}_i * \\vec{u})^2}{c^2}
-                - \\frac{3}{2} \\frac{(\\vec{u} * \\vec{u})}{c^2}
-                \\right)
-        """
-        vel_sqared = self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]
-        e_n_x_vel = np.dot(self.e, self.vel.transpose(1, 0, 2))
-        for i in range(9):
-            self.f_eq[i] = self.rho * self.w[i] * (
-                    1
-                    + (3 * e_n_x_vel[i])
-                    + (4.5 * e_n_x_vel[i] ** 2)
-                    - (1.5 * vel_sqared)
-            )
-
-    def collision_step(self):
-        """
-        Perform collision-step to update distribution function f_out.
-
-        Use distribution function :math:`f_i`,
-        equilibrium distribution function :math:`f_i^{eq}`
-        and relaxation parameter :math:`\\tau`
-        to calculate the updated distribution function :math:`f_i^*`:
-
-            .. math::
-                f_i^* = f_i - \\frac{1}{\\tau} (f_i - f_i^{eq})
-        """
-        self.f_out = self.f_in - (self.f_in - self.f_eq) / self.tau
-
-    def stream_step(self):
-        """
-        Perform streaming-step and produce the shifted distribution function.
-
-        Use distribution function :math:`f_i`
-        and direction-vectors :math:`\\vec{e}_i`
-        to calculate shifted distribution function :math:`f_i^*`:
-
-            .. math::
-                f_i^*(\\vec{x}) = f_i(\\vec{x} + \\vec{e}_i)
-        """
-        for i in range(9):
-            self.f_in[i] = np.roll(self.f_out[i], shift=self.e[i], axis=(0, 1))
-
     def correct_macroscopic(self):
         """
-        Correct incoming density and velocity at a given border
+        Correct incoming density and velocity at *zou-he*-borders
 
         Take macroscopic density :math:`\\rho` and velocity :math:`\\vec{u}`
-        and set velocity at the given border to given_instream
-        and calculate according density at given border.
+        and set velocity at borders with *zou-he* boundary condition
+        to fixed values specified in inputfile;
+        and calculate according density at these borders.
         """
-        # TODO fulfill docstring
         for direction, condition in self.boundarys.items():
             if condition == "zou-he":
 
@@ -154,15 +100,48 @@ class Simulation():
 
                     self.rho[last, :] = f1 + (2 * f2) / (1 - self.vel[0, last, :])
 
+    def calc_equilibrium(self):
+        """
+        Calculate equilibrium distribution fuction :math:`f_{eq}`.
+
+        Take macroscopic density :math:`\\rho` and velocity :math:`\\vec{u}`
+        together with direction-vectors :math:`\\vec{e}_i`
+        and their according weight-vectors :math:`w_i`
+        to calculate equilibrium distribution fuction :math:`f_{eq}`
+        using Bhatnagar-Gross-Krook (BGK) collision, with :math:`c = 1`:
+
+            .. math::
+                f_i^{eq}(\\vec{x}) = w_i\\rho(\\vec{x}) \\left(
+                1
+                + 3 \\frac{(\\vec{e}_i \cdot \\vec{u})}{c}
+                + \\frac{9}{2} \\frac{(\\vec{e}_i \cdot \\vec{u})^2}{c^2}
+                - \\frac{3}{2} \\frac{(\\vec{u} \cdot \\vec{u})}{c^2}
+                \\right)
+        """
+        vel_sqared = self.vel[0] * self.vel[0] + self.vel[1] * self.vel[1]
+        e_n_x_vel = np.dot(self.e, self.vel.transpose(1, 0, 2))
+        for i in range(9):
+            self.f_eq[i] = self.rho * self.w[i] * (
+                    1
+                    + (3 * e_n_x_vel[i])
+                    + (4.5 * e_n_x_vel[i] ** 2)
+                    - (1.5 * vel_sqared)
+            )
+
     def correct_distr_func(self):
         """
-        Correct incoming components of distribution function at Zou-He Border
+        Correct unknown components of distribution function at *zou-he* borders
 
         Take the current distribution function :math:`f_i`
         and calculate corrected values
-        for incoming components of the distribution function using Zou-He.
+        for incoming components using zou-he:
+
+            .. math::
+                f_i^{corrected} := f_i^{eq} + f_j - f_j^{eq}
+
+        for all 3 incoming :math:`\\vec{e}_i` at the border,
+        with *i*, *j* satisfying :math:`\\vec{e}_i = -\\vec{e}_j`.
         """
-        # TODO fulfill docstring
         for direction, condition in self.boundarys.items():
             if condition == "zou-he":
 
@@ -184,33 +163,66 @@ class Simulation():
                             - self.f_eq[matching_direction_indices, last, :]
                     )
 
+    def collision_step(self):
+        """
+        Perform collision-step to update distribution function f_out.
+
+        Use distribution function :math:`f_i`,
+        equilibrium distribution function :math:`f_i^{eq}`
+        and relaxation parameter :math:`\\tau`
+        to calculate the updated distribution function :math:`f_i^*`:
+
+            .. math::
+                f_i^* = f_i - \\frac{1}{\\tau} (f_i - f_i^{eq})
+        """
+        self.f_out = self.f_in - (self.f_in - self.f_eq) / self.tau
+
     def bounce_back(self):
         """
-        Apply bounce back boundary condition (BC).
+        Apply bounce back (no-slip) boundary condition at obstacles.
 
         Take the current distribution function :math:`f_i`
-        and the distribution function after collision :math:`f_i^*`
-        together with an array that specifies all obstacles
-        and a list of indices *e_inverse*
-        that correspond to the inverse directions of :math:`\\vec{e}_i`.\n
-        Compute a distribution function :math:`f_i^{BC}` that satisfies BC
+        together with the obstacle-array and a list of indices        
+        that correspond to the inverse directions of :math:`\\vec{e}_i`.
+
+        Correct the distribution function after collision :math:`f_i^*`
         by copying components of the distribution function :math:`f_i`
-        - which would stream into the obstacle -
+        - which would stream into the obstacle (:math:`\\vec{x} = obstacle`) -
         into their inverse direction
-        of the post-collision distribution function.
+        of the post-collision distribution function :math:`f_i^*`:
+
+            .. math::
+                f_i^*(\\vec{x} = obstacle) := f_j(\\vec{x} = obstacle)
+
+        with *i*, *j* satisfying :math:`\\vec{e}_i = -\\vec{e}_j`.
         """
         for i, j in enumerate(self.e_inverse):
             self.f_out[i, self.obstacle] = self.f_in[j, self.obstacle]
+
+    def stream_step(self):
+        """
+        Perform streaming-step and produce the shifted distribution function.
+
+        Use distribution function :math:`f_i`
+        and direction-vectors :math:`\\vec{e}_i`
+        to calculate shifted distribution function :math:`f_i^*`:
+
+            .. math::
+                f_i^*(\\vec{x}) = f_i(\\vec{x} + \\vec{e}_i)
+        """
+        for i in range(9):
+            self.f_in[i] = np.roll(self.f_out[i], shift=self.e[i], axis=(0, 1))
 
     def correct_outflow(self):
         """
         Correct distribution function
 
         Take post-streaming distribution function :math:`f_i`
-        and replace incorrectly incoming components after streaming
-        with second to last entries from that same distribution function.
+        and replace incorrectly incoming components (due to streaming)
+        at an *outflow*-border with second-to-last entries
+        (one gridpoint away from the border)
+        from that same distribution function.
         """
-        # TODO fulfill docstring
         for direction, condition in self.boundarys.items():
             if condition == "outflow":
 
@@ -226,6 +238,9 @@ class Simulation():
                                                                      second_to_last, :]
 
     def do_simulation_step(self, step):
+        """
+        Perform an iteration step with the current Simulation
+        """
         self.calc_macroscopic()
         self.correct_macroscopic()
         self.calc_equilibrium()
@@ -238,8 +253,7 @@ class Simulation():
 
     def run_simulation(self):
         """
-
-        :return:
+        Start simulation
         """
         self.vel[:] = 0
         self.rho[:] = 1
