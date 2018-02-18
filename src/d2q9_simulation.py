@@ -352,11 +352,12 @@ class Simulation():
         for step in range(1, self.timesteps + 1):
             self.do_simulation_step()
             utilities.store_output(self, step)
-            utilities.progress_bar(step - 1, self.timesteps)
+            if not self.args.no_progessbar:
+                utilities.progress_bar(step - 1, self.timesteps)
         t1 = time.time()
 
         # performance feedback
-        if self.args.verbose:
+        if self.args.performance_feedback:
             print("\n Performance feedback: \n"
                   "%i steps in %2.f seconds with %.2f M su/s \n"
                   "[site updates per second] = number of lattice sites updates per second"
