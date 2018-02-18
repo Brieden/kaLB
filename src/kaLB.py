@@ -27,8 +27,16 @@ def parse_arguments():
         help="Specify path where to save the output."
     )
     parser.add_argument(
-        '-v', '--verbose', required=False, action='store_true',
-        help="With this command, you can activate an issue of many hints."
+        '-np', '--no_progessbar', required=False, action='store_true',
+        help="With this command, you can hide the progressbar."
+    )
+    parser.add_argument(
+        '-p', '--performance_feedback', required=False, action='store_true',
+        help="With this command, you can activate a performance-feedback at the end."
+    )
+    parser.add_argument(
+        '-so', '--show_obstacle', required=False, action='store_true',
+        help="With this command, you can visually check your obstacle before simulation starts."
     )
     parser.add_argument(
         '-s', '--snapshot', required=False, type=str,

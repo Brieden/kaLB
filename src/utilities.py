@@ -62,7 +62,7 @@ def obstacles_definition(sim, obstacle_parameters):
             print("obstacle ", obstacle_parameter, "not recognised")
             quit()
 
-    if sim.args.verbose:
+    if sim.args.show_obstacle:
         plt.imshow(sim.obstacle.T, origin='lower', cmap='Greys', interpolation='nearest')
         plt.show()
 
@@ -132,7 +132,7 @@ def png_importer(sim, png_path):
         image = img.imread(png_path)[:, :, :-1].sum(axis=2)
         image = np.rot90(np.flipud(np.fliplr(image)))
     except IOError as error:
-        print("ERROR: It was not possible to read the picture: %s "% png_path + str(error))
+        print("ERROR: It was not possible to read the picture: %s " % png_path + str(error))
         quit()
     if image.shape == sim.shape:
         return image[:] < 1
@@ -316,7 +316,7 @@ def system_test(args):
     """
 
     # reading velocity values of the last timestep hdf5 file
-    f = h5py.File(args.output +"temp_system_test.hdf5", 'r')
+    f = h5py.File(args.output + "temp_system_test.hdf5", 'r')
     velocity_names = list(f['raw data output configuration']['velocity'])
     velocity_value = (f['raw data output configuration']['velocity'][velocity_names[-1]])
     os.remove(args.output + "temp_system_test.hdf5")
@@ -331,12 +331,13 @@ def system_test(args):
         print("\nThe system test flow in the pipe was passed.")
     else:
         print("\nThe system test flow in the pipe was not passed.")
-    if args.verbose:
-        plt.plot(y_speed, label="Values of the simulation.")
-        b = np.poly1d(coefs)
-        plt.plot(x, b(x), "x", label="parabolic fit as a reference")
-        plt.title("Velocity profile at the end of a tube")
-        plt.xlabel("Position x: at right angles to the wall")
-        plt.ylabel("Speed")
-        plt.legend()
-        plt.show()
+
+    # plot the speedprofile with the fit function
+    plt.plot(y_speed, label="Values of the simulation.")
+    b = np.poly1d(coefs)
+    plt.plot(x, b(x), "x", label="parabolic fit as a reference")
+    plt.title("Velocity profile at the end of a tube")
+    plt.xlabel("Position x: at right angles to the wall")
+    plt.ylabel("Speed")
+    plt.legend()
+    plt.show()
