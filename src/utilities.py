@@ -1,3 +1,7 @@
+"""
+Ths file holds all the outsources utility and helper functions kaLB needs.
+kaLB is not intendet to run without these helper functions.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as img
@@ -7,6 +11,14 @@ import os
 
 
 def simulation_parameters_definition(sim, simulation_parameters):
+    """
+    Read simulation parameters given at input and initialize instance variables
+
+    :param sim: Simulation instance
+    :param simulation_parameters: dictionary containing the simulation parameters
+    """
+
+    # read parameters from input dictionary
     sim.name = simulation_parameters["simulation name"]
     sim.id = simulation_parameters["simulation id"]
     sim.timesteps = simulation_parameters["time steps"]
@@ -15,6 +27,7 @@ def simulation_parameters_definition(sim, simulation_parameters):
     sim.n_y = simulation_parameters["lattice points y"]
     sim.tau = simulation_parameters["tau"]
 
+    # initialize instance variables
     sim.shape = (sim.n_x, sim.n_y)
     sim.rho = np.empty(shape=sim.shape)
     sim.vel = np.empty(shape=(2, sim.shape[0], sim.shape[1]))
@@ -28,11 +41,12 @@ def obstacles_definition(sim, obstacle_parameters):
     Function to combine the management and association of different obstacles.
     In the loop over the obstacle can be added further types of them.
 
-    :param sim:
-    :param obstacle_parameters:
-    :return: A boolean matrix in the dimension of the simulation grid with a "true" at
-    the points where there is an obstacle.
+    :param sim: Simulation instance
+    :param obstacle_parameters: dictionary containing the characteristics of the obstacle
+    :return: **obstacle**
+        boolean ndarray that is *True* at every gridpoint that is blocked by the obstacle.
     """
+
     sim.obstacle = np.full(shape=sim.shape, fill_value=False)
     for obstacle_parameter in obstacle_parameters:
         if obstacle_parameter["type"] == "cylindrical obstacle":
@@ -55,25 +69,42 @@ def obstacles_definition(sim, obstacle_parameters):
 
 def cylinder_function(sim, obstacle_parameter):
     """
+    Helper function to define round obstacles
 
-    :param obstacle_parameter:
-    :return:
+    Create a boolean numpy-array with the same shape as the simulated grid
+    with *True*-values at every gridpoint that is blocked by the obstacle.
+
+    :param sim: Simulation instance
+    :param obstacle_parameter: dictionary containing the characteristics of the circle
+    :return: **obstacle**
+        boolean ndarray that specifies the cylindrical obstacle
+        in an array with shape = (*n_x*, *n_y*)
     """
+    
     cylinder_y = obstacle_parameter["y-position"]
     cylinder_x = obstacle_parameter["x-position"]
     cylinder_r = obstacle_parameter["radius"]
-
-    return np.fromfunction(
+    cylinder = np.fromfunction(
         lambda x, y: (cylinder_x - x) ** 2 + (cylinder_y - y) ** 2 < cylinder_r ** 2,
-        sim.shape)
+        sim.shape
+    )
+    return cylinder
 
 
 def recktangle_function(sim, obstacle_parameter):
     """
+    Helper function to define rectangular obstacles
 
-    :param obstacle_parameter:
-    :return:
+    Create a boolean numpy-array with the same shape as the simulated grid
+    with *True*-values at every gridpoint that is blocked by the obstacle.
+
+    :param sim: Simulation instance
+    :param obstacle_parameter: dictionary containing the characteristics of the rectangle
+    :return: **obstacle**
+        boolean ndarray that specifies the rectangular obstacle
+        in an array with shape = (*n_x*, *n_y*)
     """
+
     point1 = obstacle_parameter["bottom_left"]
     point2 = obstacle_parameter["top_right"]
     recktangle = np.full(shape=sim.shape, fill_value=False)
@@ -83,9 +114,20 @@ def recktangle_function(sim, obstacle_parameter):
 
 def png_importer(sim, png_path):
     """
-    :param png_path:
-    :return:
+    Helper function to define rectangular obstacles
+
+    Create a boolean numpy-array with the same shape as the simulated grid
+    with *True*-values at every gridpoint that is dark in a black and white .png file.
+
+    If the shape of the .png file does not match the execution will be stopped.
+
+    :param sim: Simulation instance
+    :param png_path: path to the obstacle .png file
+    :return: **obstacle**
+        boolean ndarray that specifies the rectangular obstacle
+        in an array with shape = (*n_x*, *n_y*)
     """
+
     try:
         image = img.imread(png_path)[:, :, :-1].sum(axis=2)
         image = np.rot90(np.flipud(np.fliplr(image)))
@@ -100,15 +142,33 @@ def png_importer(sim, png_path):
 
 
 def set_boundary_conditions(sim, boundary_conditions):
+    """
+    Helper function to check and define boundary conditions
+
+    Read the specified conditions from the input dictionary
+    and build up a valid dictionary
+    that easily yield die boundary condition for every cardinal direction.
+    This dictionary is later used to correct for boundary conditions.
+    \n
+    For bounceback condition an obstacle is added to the obstacle instance variable.
+    
+    :param sim: Simulation instance
+    :param boundary_conditions: dictionary containing the boundary conditions
+    """
+    
+    # setup
     directions = np.array(["N", "E", "S", "W"])
     sim.opposite_directions = {"N": "S", "E": "W", "S": "N", "W": "E"}
     sim.last_indices = {"N": (-1, -2), "E": (-1, -2), "S": (0, 1), "W": (0, 1)}
     sim.boundarys = {}
     sim.zou_he_conditions = {}
 
-    # TODO zeug
+    # iterate through all cardinal directions
+    # make sure every direction is specified with a valid boundary condition
     for direction in directions:
         bc = boundary_conditions[direction]
+        
+        # periodic shoud enforce opposite direction to be periodic as well
         if bc["type"] == "periodic":
             oppo_bc = boundary_conditions[sim.opposite_directions[direction]]
             if oppo_bc["type"] == "periodic":
@@ -116,6 +176,8 @@ def set_boundary_conditions(sim, boundary_conditions):
             else:
                 print("ERROR: Periodic boundary conditions do not match")
                 quit()
+        
+        # insert a 1-point thick obstacle at the bounceback border
         elif bc["type"] == "bounce_back":
             sim.boundarys[direction] = "bounce_back"
             if direction == "N" or direction == "S":
@@ -125,13 +187,19 @@ def set_boundary_conditions(sim, boundary_conditions):
             else:
                 print("ERROR: This state should be impossible!")
                 quit()
+        
+        # has to be testet because it is a valid boundary condition
         elif bc["type"] == "outflow":
             sim.boundarys[direction] = "outflow"
+
+        # save zou-he velocity in a dictionary in connection to the direction
         elif bc["type"] == "zou-he":
             sim.boundarys[direction] = "zou-he"
             sim.zou_he_conditions[direction] = (bc["v_x"], bc["v_y"])
+
+        # ERROR
         else:
-            print("ERROR: Boundary condition does not exist or is missing")
+            print("ERROR: A boundary condition is not valid or does not exist")
             quit()
 
 
@@ -196,11 +264,13 @@ def store_output(sim, step):
 
 def progress_bar(value, endvalue, bar_length=50):
     """
-    :param value:
-    :param endvalue:
-    :param bar_length:
-    :return:
+    Print out a progressbar to quickly see simulation progress.
+
+    :param value: A number representing the current step and therefore the progress
+    :param endvalue: The max. amount value should reach to calculate the percentage of progress
+    :param bar_length: the overall length the printed bar should have.
     """
+
     if value % 100 == 0:
         percent = float(value) / endvalue
         arrow = '-' * int(round(percent * bar_length) - 1) + '>'
