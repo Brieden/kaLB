@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This file holds the Simulation class.
+This file holds the Simulation class.\n
 The Simulation is not intendet to run without its utilities, tho.
 """
 import numpy as np

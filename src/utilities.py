@@ -1,6 +1,6 @@
 """
 A collection of needed utilities.
-Ths file holds all the outsources utility and helper functions kaLB needs.
+Ths file holds all the outsources utility and helper functions kaLB needs.\n
 kaLB is not intendet to run without these helper functions.
 """
 import numpy as np
@@ -13,7 +13,7 @@ import os
 
 def simulation_parameters_definition(sim, simulation_parameters):
     """
-    Read simulation parameters given at input and initialize instance variables
+    Read simulation parameters given at input and initialize instance variables.
 
     :param sim: Simulation instance
     :param simulation_parameters: dictionary containing the simulation parameters
@@ -39,7 +39,7 @@ def simulation_parameters_definition(sim, simulation_parameters):
 
 def obstacles_definition(sim, obstacle_parameters):
     """
-    Function to combine the management and association of different obstacles.
+    Function to combine the management and association of different obstacles.\n
     In the loop over the obstacle can be added further types of them.
 
     :param sim: Simulation instance
@@ -70,7 +70,7 @@ def obstacles_definition(sim, obstacle_parameters):
 
 def cylinder_function(sim, obstacle_parameter):
     """
-    Helper function to define round obstacles
+    Helper function to define round obstacles.
 
     Create a boolean numpy-array with the same shape as the simulated grid
     with *True*-values at every gridpoint that is blocked by the obstacle.
@@ -94,7 +94,7 @@ def cylinder_function(sim, obstacle_parameter):
 
 def recktangle_function(sim, obstacle_parameter):
     """
-    Helper function to define rectangular obstacles
+    Helper function to define rectangular obstacles.
 
     Create a boolean numpy-array with the same shape as the simulated grid
     with *True*-values at every gridpoint that is blocked by the obstacle.
@@ -115,7 +115,7 @@ def recktangle_function(sim, obstacle_parameter):
 
 def png_importer(sim, png_path):
     """
-    Helper function to define rectangular obstacles
+    Helper function to define rectangular obstacles.
 
     Create a boolean numpy-array with the same shape as the simulated grid
     with *True*-values at every gridpoint that is dark in a black and white .png file.
@@ -144,7 +144,7 @@ def png_importer(sim, png_path):
 
 def set_boundary_conditions(sim, boundary_conditions):
     """
-    Helper function to check and define boundary conditions
+    Helper function to check and define boundary conditions.
 
     Read the specified conditions from the input dictionary
     and build up a valid dictionary
@@ -206,13 +206,21 @@ def set_boundary_conditions(sim, boundary_conditions):
 
 def initialize_output(sim, output_parameters):
     """
-    :param output_parameters:
-    :return:
+    Helper function to set output parameters for simulation.
+
+    Read the three possible output parameters.
+    If given, set flags, create necessary directories,
+    set fequencies and store relevant settings in instance variables.
+    :param sim: Simulation instance
+    :param output_parameters: dictionary containing the output parameters
     """
+
+    # initialize flags
     sim.raw_output = False
     sim.picture_output = False
     sim.snapshot = False
 
+    # create output directory
     if not os.path.exists(sim.args.output):
         os.makedirs(sim.args.output)
 
@@ -233,8 +241,7 @@ def initialize_output(sim, output_parameters):
         raw_parameter = output_parameters["raw data output configuration"]
         sim.raw_output = True
         sim.raw_output_frequency = raw_parameter["output frequency"]
-        h5file = h5py.File(sim.args.output + raw_parameter["file name"]
-                           + ".hdf5", "w")
+        h5file = h5py.File(sim.args.output + raw_parameter["file name"] + ".hdf5", "w")
         h5_output = h5file.create_group("raw data output configuration")
         sim.h5_velocity = h5_output.create_group("velocity")
         sim.h5_density = h5_output.create_group("density")
@@ -242,9 +249,13 @@ def initialize_output(sim, output_parameters):
 
 def store_output(sim, step):
     """
-    :param step:
-    :return:
+    Helper function to save output.
+
+    Check if output-flags are set and save output with specified frequencies.
+    :param sim: Simulation instance
+    :param step: number specifying the current simulation step
     """
+
     if sim.snapshot:
         if step % sim.snapshot_frequency == 0:
             np.save(sim.args.output + "snapshots/snap_%05i" % (step + sim.step_offset), sim.f_in)
@@ -254,12 +265,19 @@ def store_output(sim, step):
             sim.h5_density.create_dataset("%i" % (step + sim.step_offset), data=sim.rho)
     if sim.picture_output:
         if step % sim.picture_output_frequency == 0:
-            plt.imshow((sim.vel[0] * sim.vel[0] + sim.vel[1] * sim.vel[1]).T, origin='lower', vmin=0,
-                       vmax=0.004)
+            plt.imshow(
+                (sim.vel[0] * sim.vel[0] + sim.vel[1] * sim.vel[1]).T,
+                origin='lower',
+                vmin=0,
+                vmax=0.004
+            )
             plt.title("t = %i" % (step + sim.step_offset))
             plt.xlabel("x")
             plt.ylabel("y")
-            plt.savefig(sim.args.output + sim.picture_output_name + "%05i." % (step + sim.step_offset) + sim.picture_output_typ)
+            plt.savefig(
+                sim.args.output + sim.picture_output_name + "%05i."
+                % (step + sim.step_offset) + sim.picture_output_typ
+            )
             plt.cla()
 
 
@@ -283,14 +301,19 @@ def progress_bar(value, endvalue, bar_length=50):
 
 def system_test(args):
     """
-    Test for speed profiles with fit of a parabola function to check the software with a known problem
+    Perform a systemtest with a 'flow thru a narrow pipe' scenario.
+
+    Test for speed-profiles with fit of a parabola function
+    to check the software with a known problem.
+
+    The last step of the system test is to check
+    if the velocity profile at the end of the tube is close to a parabola.
+    For this we read out from the hdf5 file the last time step of a simulation.
+    With numpy.polyfit, a parabola is fitted
+    and its errors are used as a decision to pass the test.\n
+    The limits, values and factors were set according to empirical values.
 
     :param args: to check the verbose state
-
-    The last step of the system test is to check if the velocity profile at the end of the tube is close to a parabola.
-    For this we read out from the hdf5 file the last time step of a simulation.
-    With numpy.polyfit, a parabola is fitted and its errors are used as a decision to pass the test. \n
-    The limits, values and factors were set according to empirical values.
     """
 
     # reading velocity values of the last timestep hdf5 file
