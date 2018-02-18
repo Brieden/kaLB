@@ -1,3 +1,6 @@
+"""
+A collection of needed utilities.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as img
@@ -30,8 +33,8 @@ def obstacles_definition(sim, obstacle_parameters):
 
     :param sim:
     :param obstacle_parameters:
-    :return: A boolean matrix in the dimension of the simulation grid with a "true" at
-    the points where there is an obstacle.
+    :return: A boolean matrix in the dimension of the simulation grid with a "true" at the points where there is an obstacle.
+
     """
     sim.obstacle = np.full(shape=sim.shape, fill_value=False)
     for obstacle_parameter in obstacle_parameters:
@@ -70,7 +73,6 @@ def cylinder_function(sim, obstacle_parameter):
 
 def recktangle_function(sim, obstacle_parameter):
     """
-
     :param obstacle_parameter:
     :return:
     """
@@ -212,22 +214,33 @@ def progress_bar(value, endvalue, bar_length=50):
 
 def system_test(args):
     """
+    Test for speed profiles with fit of a parabola function to check the software with a known problem
 
-    :param args:
-    :return:
+    :param args: to check the verbose state
+
+    The last step of the system test is to check if the velocity profile at the end of the tube is close to a parabola.
+    For this we read out from the hdf5 file the last time step of a simulation.
+    With numpy.polyfit, a parabola is fitted and its errors are used as a decision to pass the test. \n
+    The limits, values and factors were set according to empirical values.
     """
+
+    # reading velocity values of the last timestep hdf5 file
     f = h5py.File("./output/system_test.hdf5", 'r')
     velocity_names = list(f['raw data output configuration']['velocity'])
     velocity_value = (f['raw data output configuration']['velocity'][velocity_names[-1]])
-    speed = velocity_value[0, -3, :]
-    x = range(len(speed))
-    coefs, residuals, _, _, _ = np.polyfit(x, speed, 2, full=True)
-    if residuals < speed.mean() * 1e-4:
+
+    # Fit the speed profile at the exit of the tube
+    y_speed = velocity_value[0, -2, :]
+    x = range(len(y_speed))
+    coefs, residuals, _, _, _ = np.polyfit(x, y_speed, 2, full=True)
+
+    # Error estimate and if necessary plot
+    if residuals < y_speed.mean() * 1e-4:
         print("\nThe system test flow in the pipe was passed.")
     else:
         print("\nThe system test flow in the pipe was not passed.")
     if args.verbose:
-        plt.plot(speed, label="Values of the simulation.")
+        plt.plot(y_speed, label="Values of the simulation.")
         b = np.poly1d(coefs)
         plt.plot(x, b(x), "x", label="parabolic fit as a reference")
         plt.title("Velocity profile at the end of a tube")
