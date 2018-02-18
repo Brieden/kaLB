@@ -357,9 +357,8 @@ class Simulation():
 
         # performance feedback
         if self.args.verbose:
-
             print("\n Performance feedback: \n"
-                  "%i steps in %2.f seconds with %.2f M su/s \n\n"
+                  "%i steps in %2.f seconds with %.2f M su/s \n"
                   "[site updates per second] = number of lattice sites updates per second"
                   % (self.timesteps, t1 - t0,
                      self.n_x * self.n_y * self.timesteps * 1e-6 / (t1 - t0)))

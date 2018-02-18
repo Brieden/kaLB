@@ -18,7 +18,6 @@ def simulation_parameters_definition(sim, simulation_parameters):
     :param sim: Simulation instance
     :param simulation_parameters: dictionary containing the simulation parameters
     """
-
     # read parameters from input dictionary
     sim.name = simulation_parameters["simulation name"]
     sim.id = simulation_parameters["simulation id"]
@@ -133,7 +132,7 @@ def png_importer(sim, png_path):
         image = img.imread(png_path)[:, :, :-1].sum(axis=2)
         image = np.rot90(np.flipud(np.fliplr(image)))
     except IOError as error:
-        print("ERROR: It was not possible to read the picture: " + str(png_path))
+        print("ERROR: It was not possible to read the picture: %s "% png_path + str(error))
         quit()
     if image.shape == sim.shape:
         return image[:] < 1
@@ -317,9 +316,10 @@ def system_test(args):
     """
 
     # reading velocity values of the last timestep hdf5 file
-    f = h5py.File("./output/system_test.hdf5", 'r')
+    f = h5py.File(args.output +"temp_system_test.hdf5", 'r')
     velocity_names = list(f['raw data output configuration']['velocity'])
     velocity_value = (f['raw data output configuration']['velocity'][velocity_names[-1]])
+    os.remove(args.output + "temp_system_test.hdf5")
 
     # Fit the speed profile at the exit of the tube
     y_speed = velocity_value[0, -2, :]

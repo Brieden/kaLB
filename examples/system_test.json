@@ -20,7 +20,7 @@
 
 	"output configuration": {
 		"raw data output configuration": {
-			"file name"       : "system_test",
+			"file name"       : "temp_system_test",
 			"output frequency": 1000
 		}
 	}
