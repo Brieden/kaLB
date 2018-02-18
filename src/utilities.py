@@ -80,7 +80,7 @@ def cylinder_function(sim, obstacle_parameter):
         boolean ndarray that specifies the cylindrical obstacle
         in an array with shape = (*n_x*, *n_y*)
     """
-    
+
     cylinder_y = obstacle_parameter["y-position"]
     cylinder_x = obstacle_parameter["x-position"]
     cylinder_r = obstacle_parameter["radius"]
@@ -151,11 +151,11 @@ def set_boundary_conditions(sim, boundary_conditions):
     This dictionary is later used to correct for boundary conditions.
     \n
     For bounceback condition an obstacle is added to the obstacle instance variable.
-    
+
     :param sim: Simulation instance
     :param boundary_conditions: dictionary containing the boundary conditions
     """
-    
+
     # setup
     directions = np.array(["N", "E", "S", "W"])
     sim.opposite_directions = {"N": "S", "E": "W", "S": "N", "W": "E"}
@@ -167,7 +167,7 @@ def set_boundary_conditions(sim, boundary_conditions):
     # make sure every direction is specified with a valid boundary condition
     for direction in directions:
         bc = boundary_conditions[direction]
-        
+
         # periodic shoud enforce opposite direction to be periodic as well
         if bc["type"] == "periodic":
             oppo_bc = boundary_conditions[sim.opposite_directions[direction]]
@@ -176,7 +176,7 @@ def set_boundary_conditions(sim, boundary_conditions):
             else:
                 print("ERROR: Periodic boundary conditions do not match")
                 quit()
-        
+
         # insert a 1-point thick obstacle at the bounceback border
         elif bc["type"] == "bounce_back":
             sim.boundarys[direction] = "bounce_back"
@@ -187,7 +187,7 @@ def set_boundary_conditions(sim, boundary_conditions):
             else:
                 print("ERROR: This state should be impossible!")
                 quit()
-        
+
         # has to be testet because it is a valid boundary condition
         elif bc["type"] == "outflow":
             sim.boundarys[direction] = "outflow"
