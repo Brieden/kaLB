@@ -28,7 +28,7 @@ plt.style.use('bmh')
 plt.rcParams['figure.figsize'] = (16.0, 9.0)
 
 
-def ArgumentParser():
+def parse_arguments():
     """
     Parse commandline arguments.
     """
@@ -72,79 +72,70 @@ def make_velocity_pictures(number):
     plt.cla()
 
 
-def main():
-    """
-    main function gets executed
-    """
+# security check so that no files are overwritten
+if os.path.isfile("clip_density.mp4"):
+    print("file clip_density.mp4 already exists. Please rename it and start again.")
+    quit()
+if os.path.isfile("clip_velocity.mp4"):
+    print("file clip_velocity.mp4 already exists. Please rename it and start again.")
+    quit()
 
-    # security check so that no files are overwritten
-    if os.path.isfile("clip_density.mp4"):
-        print("file clip_density.mp4 already exists. Please rename it and start again.")
-        quit()
-    if os.path.isfile("clip_velocity.mp4"):
-        print("file clip_velocity.mp4 already exists. Please rename it and start again.")
-        quit()
+# hdf5 file is read.
+args = parse_arguments()
+f = h5py.File(args.input, 'r')
+a_group_key = list(f.keys())
 
-    # hdf5 file is read.
-    args = parse_arguments()
-    f = h5py.File(args.input, 'r')
-    a_group_key = list(f.keys())
+# Values are read for the density and for speed and names are given.
+if 'raw data output configuration' in a_group_key:
 
-    # Values are read for the density and for speed and names are given.
-    if 'raw data output configuration' in a_group_key:
+    if 'density' in list(f['raw data output configuration']):
+        density_values = []
+        density_names = list(f['raw data output configuration']['density'])
+        for i, name in enumerate(density_names):
+            density_names[i] = int(name)
+        for i in f['raw data output configuration']['density']:
+            density_values.append(f['raw data output configuration']['density'][i])
+        density_values = [x for y, x in sorted(zip(density_names, density_values))]
+        density_names.sort()
 
-        if 'density' in list(f['raw data output configuration']):
-            density_values = []
-            density_names = list(f['raw data output configuration']['density'])
-            for i, name in enumerate(density_names):
-                density_names[i] = int(name)
-            for i in f['raw data output configuration']['density']:
-                density_values.append(f['raw data output configuration']['density'][i])
-            density_values = [x for y, x in sorted(zip(density_names, density_values))]
-            density_names.sort()
+    if 'velocity' in list(f['raw data output configuration']):
+        velocity_values = []
+        velocity_names = list(f['raw data output configuration']['velocity'])
+        for i, name in enumerate(velocity_names):
+            velocity_names[i] = int(name)
+        for i in f['raw data output configuration']['velocity']:
+            velocity_values.append(f['raw data output configuration']['velocity'][i])
+        velocity_values = [x for y, x in sorted(zip(velocity_names, velocity_values))]
+        velocity_names.sort()
 
-        if 'velocity' in list(f['raw data output configuration']):
-            velocity_values = []
-            velocity_names = list(f['raw data output configuration']['velocity'])
-            for i, name in enumerate(velocity_names):
-                velocity_names[i] = int(name)
-            for i in f['raw data output configuration']['velocity']:
-                velocity_values.append(f['raw data output configuration']['velocity'][i])
-            velocity_values = [x for y, x in sorted(zip(velocity_names, velocity_values))]
-            velocity_names.sort()
+# a folder for the images is created temporarily
+if not os.path.exists("temp_png_to_mp4"):
+    os.makedirs("temp_png_to_mp4")
 
-    # a folder for the images is created temporarily
-    if not os.path.exists("temp_png_to_mp4"):
-        os.makedirs("temp_png_to_mp4")
+# images are created in parallel
+pool = Pool()
+print("\n Start building density pictures: 0% done \n")
+pool.map(make_density_pictures, range(len(density_values)))
+print("\n Start building velocity pictures: 40% done \n")
+pool.map(make_velocity_pictures, range(len(velocity_values)))
 
-    # images are created in parallel
-    pool = Pool()
-    print("\n Start building density pictures: 0% done \n")
-    pool.map(make_density_pictures, range(len(density_values)))
-    print("\n Start building velocity pictures: 40% done \n")
-    pool.map(make_velocity_pictures, range(len(velocity_values)))
+# images are processed into videos
+if os.path.isfile("clip_density.mp4"):
+    print("file clip_density.mp4 already exists. Please rename it and start again.")
+else:
+    print("\n Start building density video: 80% done \n")
+    os.system(
+        "ffmpeg -r 30 -i ./temp_png_to_mp4/density_%01d.png -vb 10M ./clip_density.mp4")
+if os.path.isfile("clip_velocity.mp4"):
+    print("file clip_velocity.mp4 already exists. Please rename it and start again.")
+else:
+    print("\n Start building velocity video: 90% done \n")
+    os.system(
+        "ffmpeg -r 30 -i ./temp_png_to_mp4/velocity_%01d.png -vb 10M ./clip_velocity.mp4")
 
-    # images are processed into videos
-    if os.path.isfile("clip_density.mp4"):
-        print("file clip_density.mp4 already exists. Please rename it and start again.")
-    else:
-        print("\n Start building density video: 80% done \n")
-        os.system(
-            "ffmpeg -r 30 -i ./temp_png_to_mp4/density_%01d.png -vb 10M ./clip_density.mp4")
-    if os.path.isfile("clip_velocity.mp4"):
-        print("file clip_velocity.mp4 already exists. Please rename it and start again.")
-    else:
-        print("\n Start building velocity video: 90% done \n")
-        os.system(
-            "ffmpeg -r 30 -i ./temp_png_to_mp4/velocity_%01d.png -vb 10M ./clip_velocity.mp4")
-
-    # Delete the images and the temporary folder
-    for root, dirs, files in os.walk("temp_png_to_mp4", topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-    os.rmdir("temp_png_to_mp4")
-    print("\n Everything ready: 100% done \n")
-
-
-if __name__ == '__main__':
-    main()
+# Delete the images and the temporary folder
+for root, dirs, files in os.walk("temp_png_to_mp4", topdown=False):
+    for name in files:
+        os.remove(os.path.join(root, name))
+os.rmdir("temp_png_to_mp4")
+print("\n Everything ready: 100% done \n")
