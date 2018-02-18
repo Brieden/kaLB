@@ -2,7 +2,8 @@
 	"simulation parameters": {
 		"simulation name" : "flow in the pipe",
 		"simulation id"	  : "001",
-		"time steps"	  : 1001,
+		"time steps"	  : 1000,
+		"step offset"     : 0,
 		"lattice points x": 200,
 		"lattice points y": 50,
 		"tau"			  : 400

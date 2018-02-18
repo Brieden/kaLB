@@ -225,7 +225,7 @@ class Simulation():
                     self.f_in[opposite_direction_indices, last, :] = self.f_in[opposite_direction_indices,
                                                                      second_to_last, :]
 
-    def do_simulation_step(self, step):
+    def do_simulation_step(self):
         self.calc_macroscopic()
         self.correct_macroscopic()
         self.calc_equilibrium()
@@ -234,7 +234,6 @@ class Simulation():
         self.bounce_back()
         self.stream_step()
         self.correct_outflow()
-        utilities.store_output(self, step)
 
     def run_simulation(self):
         """
@@ -248,12 +247,16 @@ class Simulation():
         if self.args.snapshot:
             try:
                 self.f_in = np.load(self.args.snapshot)
+                if self.step_offset == 0:
+                    print("WARNING: You are starting from a snapshot and have not corrected the step offset.\n"
+                          "This will cause duplication in naming the steps in your output.\n")
             except IOError as error:
-                print("Error: could not open snapshot-file. Simulation was aborted.")
+                print("Error: could not open snapshot-file. Simulation was aborted.\n")
                 quit()
         t_0 = time.time()
-        for step in range(self.timesteps):
-            self.do_simulation_step(step)
+        for step in range(1, self.timesteps + 1):
+            self.do_simulation_step()
+            utilities.store_output(self, step)
             utilities.progress_bar(step, self.timesteps)
 
         if self.args.verbose:

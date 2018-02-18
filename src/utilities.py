@@ -10,6 +10,7 @@ def simulation_parameters_definition(sim, simulation_parameters):
     sim.name = simulation_parameters["simulation name"]
     sim.id = simulation_parameters["simulation id"]
     sim.timesteps = simulation_parameters["time steps"]
+    sim.step_offset = simulation_parameters["step offset"]
     sim.n_x = simulation_parameters["lattice points x"]
     sim.n_y = simulation_parameters["lattice points y"]
     sim.tau = simulation_parameters["tau"]
@@ -177,19 +178,19 @@ def store_output(sim, step):
     """
     if sim.snapshot:
         if step % sim.snapshot_frequency == 0:
-            np.save(sim.args.output + "snapshots/snap_%05i.npz" % step, sim.f_in)
+            np.save(sim.args.output + "snapshots/snap_%05i" % (step + sim.step_offset), sim.f_in)
     if sim.raw_output:
         if step % sim.raw_output_frequency == 0:
-            sim.h5_velocity.create_dataset("%i" % step, data=sim.vel)
-            sim.h5_density.create_dataset("%i" % step, data=sim.rho)
+            sim.h5_velocity.create_dataset("%i" % (step + sim.step_offset), data=sim.vel)
+            sim.h5_density.create_dataset("%i" % (step + sim.step_offset), data=sim.rho)
     if sim.picture_output:
         if step % sim.picture_output_frequency == 0:
             plt.imshow((sim.vel[0] * sim.vel[0] + sim.vel[1] * sim.vel[1]).T, origin='lower', vmin=0,
                        vmax=0.004)
-            plt.title("t = %i" % step)
+            plt.title("t = %i" % (step + sim.step_offset))
             plt.xlabel("x")
             plt.ylabel("y")
-            plt.savefig(sim.args.output + sim.picture_output_name + "%05i." % step + sim.picture_output_typ)
+            plt.savefig(sim.args.output + sim.picture_output_name + "%05i." % (step + sim.step_offset) + sim.picture_output_typ)
             plt.cla()
 
 

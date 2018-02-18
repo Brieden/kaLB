@@ -3,6 +3,7 @@
 		"simulation name" : "kaLB_example",
     	"simulation id"	  : "001",
     	"time steps"	  : 10000,
+		"step offset"     : 0,
     	"lattice points x": 400,
     	"lattice points y": 300,
 		"tau"	          : 1
