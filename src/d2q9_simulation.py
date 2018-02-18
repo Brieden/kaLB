@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This file holds the Simulation class.
+The Simulation is not intendet to run without its utilities, tho.
 """
 import numpy as np
 from src import utilities
@@ -351,7 +352,7 @@ class Simulation():
         for step in range(1, self.timesteps + 1):
             self.do_simulation_step()
             utilities.store_output(self, step)
-            utilities.progress_bar(step, self.timesteps)
+            utilities.progress_bar(step - 1, self.timesteps)
         t1 = time.time()
 
         # performance feedback
