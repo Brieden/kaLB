@@ -1,49 +1,33 @@
 
 functions and routines of the code
-==================================
+**********************************
 
-.. automodule:: core
 
-initialize
-----------
-.. autofunction:: initialize
+kaLB.py
+=======
+.. automodule:: kaLB
+  :members:
 
-calc_macroscopic
+
+d2q9_simulation.py
+==================
+.. automodule:: d2q9_simulation
+
+class Simulation
 ----------------
-.. autofunction:: calc_macroscopic
+.. autoclass:: Simulation
+  :members:
 
-calc_equilibrium
-----------------
-.. autofunction:: calc_equilibrium
+  .. automethod:: __init__
 
-collision_step
---------------
-.. autofunction:: collision_step
 
-stream_step
------------
-.. autofunction:: stream_step
+utilities
+=========
+.. automodule:: utilities
+  :members:
 
-correct_macroscopic
--------------------
-.. autofunction:: correct_macroscopic
 
-correct_distr_func
-------------------
-.. autofunction:: correct_distr_func
-
-bounce_back
-----------------
-.. autofunction:: bounce_back
-
-correct_outflow
----------------
-.. autofunction:: correct_outflow
-
-save_state
-----------
-.. autofunction:: save_state
-
-main
-----
-.. autofunction:: main
+hdf5 to mpeg
+============
+.. automodule:: hdf5_to_mpeg
+  :members:

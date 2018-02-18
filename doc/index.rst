@@ -5,12 +5,14 @@
 
 :tocdepth: 3
 
+
 kaLB = kaum ausgereiftes Lattice Boltzmann
 ==========================================
 
 Welcome, this is the user guide for kaLB
 
 .. toctree::
+   :numbered:
    :maxdepth: 3
 
    getting_started.rst
