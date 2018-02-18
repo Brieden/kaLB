@@ -3,6 +3,7 @@
 		"simulation name" : "Lid Driven Cavity",
     	"simulation id"	  : "001",
     	"time steps"	  : 20000,
+		"step offset"     : 0,
     	"lattice points x": 200,
     	"lattice points y": 200,
 		"tau"			  : 1
