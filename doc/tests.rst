@@ -1,11 +1,27 @@
 #####################
-hier kommen tests hin
+Testing
 #####################
 
+kaLB provides some unittests for the core methods of *Simulation* class,
+as well as a systemtest to test the program as a whole.
 
 Unit tests
 ==========
+The unittests for some of kaLBs most important core methods are located in a separate package called 'test'.
+There are three unittests for *calc_macroscopic*, *calc_equilibrium* and *stream_step*.
 
+For every test a mockup Simulation instance is created
+and initialized with randomly generated values in the expected range
+for velocity, density and the distribution function.
+The tests are performed on a 500x500 Grid and evaluated by NumPy's *numpy.allclose()* method.
+
+To run the unittest you can either do it from the root of the package using setuptools::
+
+	$ python setup.py test
+
+Or using unittest::
+
+	$ python -m unittest test/test_Simulation.py
 
 System test
 ===========

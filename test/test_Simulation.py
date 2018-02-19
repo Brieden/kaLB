@@ -104,12 +104,12 @@ class test_Simulation(unittest.TestCase):
         vel = self.test_sim.vel
         vel_sqared = vel[0] * vel[0] + vel[1] * vel[1]
         control_f_eq = np.empty_like(self.test_sim.f_in)
+        e_dot_vel = np.dot(e, vel.transpose(1, 0, 2))
         for i in range(9):
-            e_dot_vel = e[i, 0] * vel[0] + e[i, 1] * vel[1]
             control_f_eq[i] = rho * w[i] * (
                 1
-                + (3 * e_dot_vel)
-                + (4.5 * e_dot_vel * e_dot_vel)
+                + (3 * e_dot_vel[i])
+                + (4.5 * e_dot_vel[i] * e_dot_vel[i])
                 - (1.5 * vel_sqared)
             )
 
