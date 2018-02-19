@@ -11,13 +11,16 @@ kaLB = kaum ausgereiftes Lattice Boltzmann
 
 Welcome, this is the user guide for kaLB
 
+
 .. toctree::
    :numbered:
    :maxdepth: 3
 
    getting_started.rst
-   development.rst
-   functions.rst
+   manual.rst
+   conventions_contribute.rst
+   tests.rst
+   functions_of_the_code.rst
 
 
 List of References
