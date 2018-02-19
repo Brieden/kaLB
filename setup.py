@@ -2,14 +2,14 @@ from setuptools import setup
 
 setup(
     name='kaLB',
-    version='0.1',
+    version='1.0',
     author='Simon Schmitt, Sven Brieden',
     author_email='Briedens@uni-marburg.de, simon.schmitt@physik.uni-marburg.de',
     description='A python Lattice Boltzmann (LBM) simulation',
     keywords='lbm fluid cfd lattice boltzmann computational',
     packages=['src'],
     test_suite='test',
-    long_description='not sure what to put here', # TODO verweis auf README???
+    long_description='not sure what to put here',
     install_requires=[
         'numpy >= 1.13.3',
         'h5py >= 2.7.1',
