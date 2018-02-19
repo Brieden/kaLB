@@ -20,18 +20,18 @@ furthermore the user can specify arbitrary obstacles
 and can even import pictures that kaLB will use as obstacles.
 
 Besides this functionality kaLB provides an extra script
-to create short videos from generating hdf5 files.
+to create short videos from generated hdf5 files.
 
 ## Installation & Quick Start
 
 These instructions will get you a copy of the project
 up and running on your local machine:
 
-#### Clone repository
+##### Clone repository
 
 	$ git clone git@git.physik.uni-marburg.de:Sven_Brieden/LBM_for_Fluid_Simulations.git
 
-#### Install
+##### Install
 
 Change directory to repo's root and run:
 
@@ -39,7 +39,7 @@ Change directory to repo's root and run:
 
 All dependencies should be installed automaticly
 
-#### Run your first simulation
+##### Run your first simulation
 
 Change directory to examples folder and run:
 
@@ -47,7 +47,7 @@ Change directory to examples folder and run:
 
 wait until kaLB has done it's job!
 
-#### Output & Video
+##### Output & Video
 
 Your output data will be located at *./output/*. Run:
 
