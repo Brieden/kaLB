@@ -1,0 +1,51 @@
+{
+    "simulation parameters": {
+        "simulation name" : "kaLB_example",
+        "simulation id"   : "001",
+        "time steps"      : 4000,
+        "step offset"     : 0,
+        "lattice points x": 400,
+        "lattice points y": 300,
+        "tau"             : 1
+    },
+
+    "boundary conditions" : {
+        "N": {"type": "bounce_back"},
+        "E": {"type": "outflow"},
+        "S": {"type": "bounce_back"},
+        "W": {"type": "zou-he", "v_x" : 0.04, "v_y" : 0}
+    },
+
+    "obstacle parameters": [
+        {
+            "type"      : "cylindrical obstacle",
+            "x-position": 325,
+            "y-position": 160,
+            "radius"    : 60
+        },
+        {
+            "type"       : "recktangle obstacle",
+            "bottom_left": [ 50, 30],
+            "top_right"  : [350, 35]
+        },
+        {
+            "type"     : "png import",
+            "file name": "kaLB_logo.png"
+        }
+    ],
+
+    "output configuration": {
+        "picture output configuration": {
+            "file name"       : "kaLB_example_pic_",
+            "file type"       : "png",
+            "output frequency": 500
+        },
+        "raw data output configuration": {
+            "file name"       : "kaLB_example_raw_data",
+            "output frequency": 30
+        },
+        "snapshot": {
+            "output frequency": 5000
+        }
+    }
+}
