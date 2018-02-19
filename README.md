@@ -1,14 +1,70 @@
-![100% kaLB in Aktion][logo]
-[logo]: https://github.com/Brieden/kaLB/blob/development/Video_name_kaLB.gif "kaLB Logo"
+# kaLB = kaum ausgereiftes Lattice Boltzmann
 
-# Lattice Boltzmann Method for Fluid Simulations
+This repository contains the fluid dynamics simulation software **kaLB**.
+It is part of the course *scientific software development*.
 
-This repository contains the project work form Sven Brieden(Briedens@uni-marburg.de) for the lecture Scientific Software Development by Jan Oliver Oelerich(jan.oliver.oelerich@physik.uni-marburg.de).
- 
+Creators:
+* Sven Brieden
+* Simon Schmitt
 
-## Getting Started
+kaLB uses the *lattice boltzman method* to compute a *2DQ9* fluid dynamics simulation.
+The user is able to specify a simulation using a .json inputfile.
+kaLB then processes this input, performes a simulation and returnes a hdf5 file
+containing the macroscopic values density and velocity during simulation steps.
+In addition the user can use picture output and snapshots;
+all of them at required output frequencies.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. The project has just been started so there is not much to explain yet.
+One can choose from four different boundary conditions
+including *bounce-back* (a.k.a. no-slip) and *Zou-He*.
+furthermore the user can specify arbitrary obstacles
+and can even import pictures that kaLB will use as obstacles.
 
-### Prerequisites
-To get a quick introduction to the topic of LBM, I recommend you to look at the LBM_first_try.ipynb. This document contains both physical explanations and executable code. This file is written and tested with Jupyter notebooks and Python 3.6.4
+Besides this functionality kaLB provides an extra script
+to create short videos from generated hdf5 files.
+
+## Installation & Quick Start
+
+These instructions will get you a copy of the project
+up and running on your local machine:
+
+    1) Clone repository
+
+        $ git clone git@git.physik.uni-marburg.de:Sven_Brieden/LBM_for_Fluid_Simulations.git
+
+    2) Install
+
+        Change directory to repo's root and run:
+
+        $ python setup.py install
+
+        All dependencies should be installed automaticly
+
+    3) Run your first Simuation
+
+        Change directory to examples folder and run:
+
+        $ python ./../src/kaLB.py -i kaLB_example.json
+
+        wait until kaLB has done it's job!
+
+    4) Output & Video
+
+        Your output data will be located at *./output/*. Run:
+
+        $ python ./../src/hdf5_to_mpeg.py -i ./output/kaLB_example_raw_data.hdf5
+        
+        kaLB will create you a short Video of your first Simulation!
+
+This should get you going.
+For a more detailed explanation on how to use kaLB refer to the documentation!
+
+## Documentation
+
+The documentation should provide you with all the necessary information you may need about kaLB.
+
+To build the documentation navigate to the repos root directory and run:
+
+    $ pip install .['doc’]
+    $ python setup.py build_sphinx
+
+The documentation is now located in *./doc/build/html/index.html*
