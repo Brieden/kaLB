@@ -22,6 +22,8 @@ class Simulation
   .. automethod:: __init__
 
 
+.. _link-to-utilils:
+
 utilities.py
 ============
 .. automodule:: utilities
