@@ -7,9 +7,9 @@ Creators:
 * Sven Brieden
 * Simon Schmitt
 
-kaLB uses the *lattice boltzman method* to compute a *2DQ9* fluid dynamics simulation.
+kaLB uses the *lattice boltzmann method* to compute a *2DQ9* fluid dynamics simulation.
 The user is able to specify a simulation using a .json inputfile.
-kaLB then processes this input, performes a simulation and returnes a hdf5 file
+kaLB then processes this input, performs a simulation and returns a hdf5 file
 containing the macroscopic values density and velocity during simulation steps.
 In addition the user can use picture output and snapshots;
 all of them at required output frequencies.
@@ -39,7 +39,7 @@ up and running on your local machine:
 
         All dependencies should be installed automaticly
 
-    3) Run your first Simuation
+    3) Run your first simulation
 
         Change directory to examples folder and run:
 
@@ -64,7 +64,7 @@ The documentation should provide you with all the necessary information you may 
 
 To build the documentation navigate to the repos root directory and run:
 
-    $ pip install .['doc’]
+    $ pip install .['doc']
     $ python setup.py build_sphinx
 
 The documentation is now located in *./doc/build/html/index.html*
