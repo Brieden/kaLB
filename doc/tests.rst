@@ -44,3 +44,25 @@ The analysis always starts after the simulation and evaluates the speed field fr
 to the last saved time on the last row in the tube.
 The scenario is constructed in such a way that a liquid flows in on the left side,
 walls are defined at the top and bottom and the right side allows outflow.
+
+
+The following example shows:
+
+.. code-block:: json
+
+    {
+        "time steps": 2000,
+        "lattice points x": 500,
+        "lattice points y": 1000,
+        "tau": 400
+    }
+
+The test fails, it does not set the desired profile, is due to the fact that the tube is too thick for its length
+[lattice points x] vs. [lattice points y]. Even after more time steps, no parabolic flow profile will occur.
+
+.. image:: System_test_failed.png
+   :height: 956px
+   :width: 985px
+   :scale: 60 %
+   :alt: System test failed
+   :align: center
