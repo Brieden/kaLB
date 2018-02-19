@@ -27,6 +27,7 @@ utilities.py
 .. automodule:: utilities
   :members:
 
+.. _link-to-hdf5-to-mpeg.py:
 
 hdf5_to_mpeg.py
 ===============

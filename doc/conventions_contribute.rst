@@ -1,4 +1,4 @@
-Coding Conventions and Contributing
+Conventions and Contributing
 ===================================
 
 First off, thanks for taking the time to contribute!
