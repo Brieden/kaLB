@@ -1,7 +1,8 @@
 
 functions and routines of the code
 **********************************
-
+Here are all relevant features of our code explained. This description is intended
+for co-developer and users who wish to understand the code in their finesse.
 
 kaLB.py
 =======
@@ -21,14 +22,14 @@ class Simulation
   .. automethod:: __init__
 
 
-utilities
-=========
+utilities.py
+============
 .. automodule:: utilities
   :members:
 
 
-hdf5 to mpeg
-============
+hdf5_to_mpeg.py
+===============
 .. warning::
     ffmpeg is required for this program.
     Please make sure before using hdf5_to_mpeg that ffmpeg is installed on your system.
@@ -43,4 +44,9 @@ To speed up the process of creating images, multithreading is used.
 From the hdf5 files the density and the speed are read out and displayed in two independent videos.
 The plot settings are adapted for the kaLB example simulation and can be customized in the code for the desired problem.
 
+
+Unittests
+=========
+.. automodule:: test_Simulation
+  :members:
 
