@@ -63,7 +63,7 @@ Run a Simulation
 
 To perform a Simulation you need to have an input *.json*-file
 that holds all information about the simulation you want to perform.
-For more information about inputfiles see :ref:`link-to-manual`.
+For more information about inputfiles see :ref:`link-to-inputfile`.
 
 Execute *kaLB.py* from the directory your inputfile is located.
 
@@ -86,7 +86,7 @@ that gives you an idea how many grid-points where calculated per second.
 Congratulation! You have finished your first simulation.
 Maybe you want to try another simulation right away?
 
-Use "**Lid_Driven_Cavity.json**" for your next "**--input**" value!
+Use "**Lid_Driven_Cavity.json**" for your next "**-\\-input**" value!
 
 
 Create a Video
