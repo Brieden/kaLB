@@ -1,7 +1,7 @@
 {
     "simulation parameters": {
         "simulation name" : "Lid Driven Cavity",
-        "simulation id"   : "001",
+        "simulation id"   : "002",
         "time steps"      : 20000,
         "step offset"     : 0,
         "lattice points x": 200,
