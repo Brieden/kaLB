@@ -68,3 +68,7 @@ To build the documentation navigate to the repos root directory and run:
     $ python setup.py build_sphinx
 
 The documentation is now located in *./doc/build/html/index.html*
+
+
+If you don't want or you are not abel to build your own documentation you can use the following link:
+[kaLB-doku @ readthedocs](http://kalb-doku.readthedocs.io/en/latest/index.html)
