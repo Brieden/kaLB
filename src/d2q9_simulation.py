@@ -3,9 +3,9 @@
 This file holds the Simulation class.\n
 The Simulation is not intendet to run without its utilities, tho.
 """
+import time
 import numpy as np
 from src import utilities
-import time
 
 
 class Simulation():
@@ -105,7 +105,7 @@ class Simulation():
                         """
                     )
             except IOError as error:
-                print("Error: could not open snapshot-file. Simulation was aborted.\n")
+                print("Error: could not open snapshot-file. Simulation was aborted.\n" + str(error))
                 quit()
         else:
             self.vel[:] = 0
@@ -358,8 +358,4 @@ class Simulation():
 
         # performance feedback
         if self.args.performance_feedback:
-            print("\n Performance feedback: \n"
-                  "%i steps in %2.f seconds with %.2f M su/s \n"
-                  "[site updates per second] = number of lattice sites updates per second"
-                  % (self.timesteps, t1 - t0,
-                     self.n_x * self.n_y * self.timesteps * 1e-6 / (t1 - t0)))
+            utilities.give_powerfeedback(self, t0, t1)

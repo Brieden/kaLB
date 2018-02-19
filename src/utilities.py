@@ -3,12 +3,12 @@ A collection of needed utilities.
 Ths file holds all the outsources utility and helper functions kaLB needs.\n
 kaLB is not intendet to run without these helper functions.
 """
+import sys
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 import h5py
-import sys
-import os
 
 
 def simulation_parameters_definition(sim, simulation_parameters):
@@ -296,6 +296,22 @@ def progress_bar(value, endvalue, bar_length=50):
 
         sys.stdout.write("\rPercent: [{0}] {1}%".format(arrow + spaces, int(round(percent * 100))))
         sys.stdout.flush()
+
+
+def give_powerfeedback(sim, t0, t1):
+    print(""" \n
+      ________________________________________________________________________
+     /Performance feedback:                                                   \\
+    |%i steps in %2.f seconds with %.2f M su/s                                 |
+     \[site updates per second] = number of lattice sites updates per second  /
+      ------------------------------------------------------------------------
+                            \   ^__^
+                             \  (oo)\_______
+                                (__)\       )\/\/
+                                    ||----w |
+                                    ||     ||
+        """ % (sim.timesteps,
+               t1 - t0, sim.n_x * sim.n_y * sim.timesteps * 1e-6 / (t1 - t0)))
 
 
 def system_test(args):

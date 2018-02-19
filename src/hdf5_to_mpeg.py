@@ -20,13 +20,13 @@ The plot settings are adapted for the kaLB example simulation
 and can be customized in the code for the desired problem.
 """
 
+from multiprocessing import Pool
+import argparse
+import os
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-from multiprocessing import Pool
 import numpy as np
-import argparse
 import h5py
-import os
 
 # Set plot layout and higher resolution
 plt.style.use('bmh')
