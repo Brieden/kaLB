@@ -20,40 +20,40 @@ furthermore the user can specify arbitrary obstacles
 and can even import pictures that kaLB will use as obstacles.
 
 Besides this functionality kaLB provides an extra script
-to create short videos from generated hdf5 files.
+to create short videos from generating hdf5 files.
 
 ## Installation & Quick Start
 
 These instructions will get you a copy of the project
 up and running on your local machine:
 
-    1) Clone repository
+#### Clone repository
 
-        $ git clone git@git.physik.uni-marburg.de:Sven_Brieden/LBM_for_Fluid_Simulations.git
+	$ git clone git@git.physik.uni-marburg.de:Sven_Brieden/LBM_for_Fluid_Simulations.git
 
-    2) Install
+#### Install
 
-        Change directory to repo's root and run:
+Change directory to repo's root and run:
 
-        $ python setup.py install
+	$ python setup.py install
 
-        All dependencies should be installed automaticly
+All dependencies should be installed automaticly
 
-    3) Run your first simulation
+#### Run your first simulation
 
-        Change directory to examples folder and run:
+Change directory to examples folder and run:
 
-        $ python ./../src/kaLB.py -i kaLB_example.json
+	$ python ./../src/kaLB.py -i kaLB_example.json
 
-        wait until kaLB has done it's job!
+wait until kaLB has done it's job!
 
-    4) Output & Video
+#### Output & Video
 
-        Your output data will be located at *./output/*. Run:
+Your output data will be located at *./output/*. Run:
 
-        $ python ./../src/hdf5_to_mpeg.py -i ./output/kaLB_example_raw_data.hdf5
+	$ python ./../src/hdf5_to_mpeg.py -i ./output/kaLB_example_raw_data.hdf5
         
-        kaLB will create you a short Video of your first Simulation!
+kaLB will create a short Video of your first Simulation!
 
 This should get you going.
 For a more detailed explanation on how to use kaLB refer to the documentation!
