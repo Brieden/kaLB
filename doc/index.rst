@@ -34,7 +34,7 @@ to create short videos from generated hdf5 files.
 
 .. toctree::
    :numbered:
-   :maxdepth: 3
+   :maxdepth: 2
 
    getting_started.rst
    manual.rst
